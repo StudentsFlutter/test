@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 
 import 'login_page.dart';
 
-
 class FirstPage extends StatefulWidget {
   @override
- FirstPageState createState() =>  FirstPageState();
+  FirstPageState createState() => FirstPageState();
 }
 
 class FirstPageState extends State<FirstPage> {
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
           child: Row(
@@ -28,7 +27,6 @@ class FirstPageState extends State<FirstPage> {
                 width: 120.0,
               ),
               onPressed: () {
-               
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => LoginPage()),

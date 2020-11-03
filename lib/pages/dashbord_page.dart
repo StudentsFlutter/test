@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:students/pages/personal_info_page.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../calander.dart';
-import '../weekly_timetable.dart';
 
 class DashBoard extends StatefulWidget {
   @override
@@ -30,44 +28,6 @@ class _DashBoardState extends State<DashBoard> {
           padding: EdgeInsets.all(16.0),
           child: Column(
             children: <Widget>[
-              // Container(
-              //   height: 90,
-              //   margin: EdgeInsets.only(bottom: 30 ),
-              //   child: Row(
-              //     crossAxisAlignment: CrossAxisAlignment.start,
-              //     children: <Widget>[
-              //       CircleAvatar(
-              //         radius: 32.0 ,
-              //         backgroundColor: Colors.white ,
-              //         child: Image.asset('assets/images/female-profile.png' ),
-              //       ),
-              //       SizedBox(
-              //         width: 16,
-              //       ),
-              //       Column(
-              //         mainAxisAlignment: MainAxisAlignment.center,
-              //         crossAxisAlignment: CrossAxisAlignment.start,
-              //         children: <Widget>[
-              //           Text(
-              //             'Name : Rahaf Alshehri',
-              //             style: TextStyle(
-              //                 fontFamily: "Montserrat Medium",
-              //                 color: Colors.black,
-              //                 fontSize: 20),
-              //           ),
-              //           Text(
-              //               'ID : 43700****',
-              //               style: TextStyle(
-              //                   fontFamily: "Montserrat Medium",
-              //                   color: Colors.black,
-              //                   fontSize: 15),
-              //           ),
-
-              //         ],
-              //       )
-              //     ],
-              //   ),
-              // ),
               Expanded(
                 child: GridView.count(
                   mainAxisSpacing: 10,
@@ -104,21 +64,14 @@ class _DashBoardState extends State<DashBoard> {
                       text: 'weekly Schedule',
                       imagePath: 'assets/images/attendance.png',
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => weekly_times()),
-                        );
+                        print('weekly Schedule');
                       },
                     ),
                     DashboardCard(
                       text: 'Academic Calender',
                       imagePath: 'assets/images/weekly_schedual.png',
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Calendar()),
-                        );
+                        print('Academic Calender');
                       },
                     ),
                     DashboardCard(

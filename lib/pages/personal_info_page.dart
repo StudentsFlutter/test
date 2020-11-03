@@ -1,10 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:students/models/student_user.dart';
 import 'package:students/pages/dashbord_page.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
-const url = 'http://thinkdiff.net';
-const email = 'mahmud@example.com';
-const phone = '+880 123 456 78';
 const password = '********';
 
 class EditProfilePage extends StatefulWidget {
@@ -14,6 +15,20 @@ class EditProfilePage extends StatefulWidget {
 
 class _EditProfilePageState extends State<EditProfilePage> {
   _EditProfilePageState();
+
+  StudentUser user;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final userRef = Firestore.instance.collection('users');
+  Future<StudentUser> fetch_user_firestore() async {
+    final snapshot = _auth.currentUser;
+
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp();
+
+    DocumentSnapshot doc = await userRef.document(snapshot.uid).get();
+    StudentUser userM = StudentUser.fromDocument(doc);
+    return userM;
+  }
 
   void _showDialog(BuildContext context, {String title, String msg}) {
     final dialog = AlertDialog(
@@ -37,111 +52,137 @@ class _EditProfilePageState extends State<EditProfilePage> {
     showDialog(context: context, builder: (x) => dialog);
   }
 
+  void getUserData() async {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      user = await fetch_user_firestore();
+      setState(() {
+        isLoading = false;
+      });
+    } catch (ex) {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    getUserData();
+    super.initState();
+  }
+
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              CircleAvatar(
-                radius: 50,
-                backgroundImage: AssetImage('assets/images/female-profile.png'),
-              ),
-              Text(
-                'Sara Hassan Mdkhli',
-                style: TextStyle(
-                  fontSize: 20.0,
-                  color: Colors.teal,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Pacifico',
-                ),
-              ),
-              SizedBox(
-                height: 20,
-                width: 200,
-                child: Divider(
-                  color: Colors.black,
-                ),
-              ),
-              InfoCard(
-                text: 'id : 437001164',
-                icon: Icons.web,
-              ),
-              InfoCard(
-                text: email,
-                icon: Icons.email,
-                onPressed: () async {
-                  final emailAddress = 'mailto:$email';
-
-                  if (await launcher.canLaunch(emailAddress)) {
-                    await launcher.launch(emailAddress);
-                  } else {
-                    _showDialog(
-                      context,
-                      title: 'Sorry',
-                      msg: 'Email can not be send. Please try again!',
-                    );
-                  }
-                },
-              ),
-              InfoCard(
-                text: phone,
-                icon: Icons.phone,
-              ),
-              InfoCard(
-                text: 'Student',
-                icon: Icons.web,
-              ),
-              InfoCard(
-                  text: password,
-                  icon: Icons.card_membership,
-                  onPressed: () async {
-                    String removeSpaceFromPhoneNumber =
-                        phone.replaceAll(new RegExp(r"\s+\b|\b\s"), "");
-                    final password = 'password';
-                  }),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  OutlineButton(
-                    padding: EdgeInsets.symmetric(horizontal: 50),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20)),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => DashBoard()),
-                      );
-                    },
-                    child: Text("CANCEL",
-                        style: TextStyle(
-                            fontSize: 14,
-                            letterSpacing: 2.1,
-                            color: Colors.black)),
-                  ),
-                  RaisedButton(
-                    onPressed: () {},
-                    color: Colors.teal[200],
-                    padding: EdgeInsets.symmetric(horizontal: 50),
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20)),
-                    child: Text(
-                      "SAVE",
-                      style: TextStyle(
-                          fontSize: 14,
-                          letterSpacing: 2.1,
-                          color: Colors.white),
+        child: isLoading
+            ? Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundImage:
+                          AssetImage('assets/images/female-profile.png'),
                     ),
-                  )
-                ],
+                    Text(
+                      user.name,
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        color: Colors.teal,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Pacifico',
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                      width: 200,
+                      child: Divider(
+                        color: Colors.black,
+                      ),
+                    ),
+                    InfoCard(
+                      text: user.id,
+                      icon: Icons.web,
+                    ),
+                    InfoCard(
+                      text: user.email,
+                      icon: Icons.email,
+                      onPressed: () async {
+                        final emailAddress = 'mailto:${user.email}';
+
+                        if (await launcher.canLaunch(emailAddress)) {
+                          await launcher.launch(emailAddress);
+                        } else {
+                          _showDialog(
+                            context,
+                            title: 'Sorry',
+                            msg: 'Email can not be send. Please try again!',
+                          );
+                        }
+                      },
+                    ),
+                    InfoCard(
+                      text: user.phoneNumber,
+                      icon: Icons.phone,
+                    ),
+                    InfoCard(
+                      text: 'Student',
+                      icon: Icons.web,
+                    ),
+                    InfoCard(
+                        text: password,
+                        icon: Icons.card_membership,
+                        onPressed: () async {
+                          // String removeSpaceFromPhoneNumber =
+                          //     phone.replaceAll(new RegExp(r"\s+\b|\b\s"), "");
+                          // final password = 'password';
+                        }),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        OutlineButton(
+                          padding: EdgeInsets.symmetric(horizontal: 50),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => DashBoard()),
+                            );
+                          },
+                          child: Text("CANCEL",
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  letterSpacing: 2.1,
+                                  color: Colors.black)),
+                        ),
+                        RaisedButton(
+                          onPressed: () {},
+                          color: Colors.teal[200],
+                          padding: EdgeInsets.symmetric(horizontal: 50),
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
+                          child: Text(
+                            "SAVE",
+                            style: TextStyle(
+                                fontSize: 14,
+                                letterSpacing: 2.1,
+                                color: Colors.white),
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
       ),
     );
   }

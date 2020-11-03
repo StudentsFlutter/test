@@ -23,6 +23,9 @@ class _LoginPageState extends State<LoginPage> {
 
   Future login() async {
     if (!formKey.currentState.validate()) return;
+     setState(() {
+      isLogin = true;
+    });
     var user;
     try {
       user = (await _auth.signInWithEmailAndPassword(
@@ -36,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
     }
     if (user != null) {
       setState(() {
-        isLogin = true;
+        isLogin = false;
       });
     } else {
       setState(() {
@@ -44,12 +47,6 @@ class _LoginPageState extends State<LoginPage> {
       });
       return;
     }
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => DashBoard()),
-    );
-
-    //if login
     Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(

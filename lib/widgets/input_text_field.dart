@@ -31,9 +31,16 @@ class InputTextField extends StatelessWidget {
           onChanged: onChanged,
            decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-          hintText: hintText,
+          labelText: hintText,
+          
+          focusedBorder: OutlineInputBorder(
+              borderSide:
+                  BorderSide(color: Colors.teal, width: 1.0),
+              borderRadius: BorderRadius.all(Radius.circular(32.0))),
           border:
               OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
+
+              
           // decoration: InputDecoration(
           //   hintText: hintText,
           //   contentPadding:

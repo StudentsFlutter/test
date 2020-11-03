@@ -4,12 +4,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:students/pages/dashbord_page.dart';
 //import 'package:flutter_all/teachers.dart';
-import '../Register.dart';
+
 import 'package:http/http.dart' as http;
 
+import 'Register_page.dart';
+
 // ignore: camel_case_types
-
-
 
 class Login extends StatefulWidget {
   @override
@@ -25,11 +25,12 @@ class _LoginState extends State<Login> {
   String username = '';
 
   Future login4() async {
-     Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) => DashBoard(),
-                                      ),(r) => false);
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) => DashBoard(),
+        ),
+        (r) => false);
   }
 
   @override
@@ -81,12 +82,8 @@ class _LoginState extends State<Login> {
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(30.0, 15.0, 20.0, 15.0),
         onPressed: () {
-          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) => Register()
-                                      ));
-          
+          Navigator.push(context,
+              MaterialPageRoute(builder: (BuildContext context) => Register()));
         },
         child: Text("Register",
             textAlign: TextAlign.center,
@@ -97,11 +94,11 @@ class _LoginState extends State<Login> {
 
     return Scaffold(
       body: SafeArea(
-              child: SingleChildScrollView(
-                              child: Center(
-          child: Container(
-            color: Colors.white,
-            child: Padding(
+        child: SingleChildScrollView(
+          child: Center(
+            child: Container(
+              color: Colors.white,
+              child: Padding(
                 padding: const EdgeInsets.all(36.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -142,10 +139,10 @@ class _LoginState extends State<Login> {
                     ),
                   ],
                 ),
+              ),
             ),
           ),
         ),
-              ),
       ),
     );
   }

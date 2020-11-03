@@ -4,10 +4,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:students/pages/dashbord_page.dart';
-import 'login.dart';
+
 import 'package:toast/toast.dart';
 
-
+import 'login_page.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -25,10 +25,10 @@ class _RegisterState extends State<Register> {
   TextEditingController Password = TextEditingController();
 
   Future register() async {
-     Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => DashBoard()),
-        );
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => DashBoard()),
+    );
     // var url = " http://192.168.64.2/PF/Register1.php"; //IMORTE
     // var input = {
     //   "ID ": ID.text,
@@ -165,11 +165,11 @@ class _RegisterState extends State<Register> {
     );
     return Scaffold(
       body: SafeArea(
-              child: SingleChildScrollView(
-                              child: Center(
-          child: Container(
-            color: Colors.white,
-            child: Padding(
+        child: SingleChildScrollView(
+          child: Center(
+            child: Container(
+              color: Colors.white,
+              child: Padding(
                 padding: const EdgeInsets.all(36.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -199,10 +199,10 @@ class _RegisterState extends State<Register> {
                     ),
                   ],
                 ),
+              ),
             ),
           ),
         ),
-              ),
       ),
     );
   }

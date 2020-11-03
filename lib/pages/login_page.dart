@@ -1,30 +1,32 @@
 import 'dart:ui';
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:students/pages/dashbord_page.dart';
-//import 'package:flutter_all/teachers.dart';
+import 'package:students/widgets/input_text_field.dart';
 
-import 'package:http/http.dart' as http;
 
 import 'Register_page.dart';
 
-// ignore: camel_case_types
 
-class Login extends StatefulWidget {
+class LoginPage extends StatefulWidget {
   @override
-  _LoginState createState() => _LoginState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginState extends State<Login> {
+class _LoginPageState extends State<LoginPage> {
   TextStyle style = TextStyle(fontFamily: 'Scholar', fontSize: 20.0);
-  TextEditingController user = new TextEditingController();
-  TextEditingController pass = new TextEditingController();
+ final formKey = GlobalKey<FormState>();
+  String password;
+  String email;
+  Future login() async {
+      if (!formKey.currentState.validate()) return;
+    setState(() {
+      isLogin = true;
+    });
 
-  String msg = '';
-  String username = '';
 
-  Future login4() async {
+    //if login 
     Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
@@ -32,32 +34,10 @@ class _LoginState extends State<Login> {
         ),
         (r) => false);
   }
-
+ bool isLogin = false;
   @override
   Widget build(BuildContext context) {
-    // ignore: non_constant_identifier_names
-    final textField = TextField(
-      controller: user,
-      obscureText: false,
-      style: style,
-      decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-          hintText: 'Name',
-          border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
-    );
-
-    final passwordField = TextField(
-      controller: pass,
-      obscureText: true,
-      style: style,
-      decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-          hintText: "Password",
-          border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
-    );
-
+   
     final loginButton = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(50.0),
@@ -66,7 +46,7 @@ class _LoginState extends State<Login> {
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(30.0, 15.0, 20.0, 15.0),
         onPressed: () {
-          login4();
+          login();
         },
         child: Text("Login",
             textAlign: TextAlign.center,
@@ -83,7 +63,7 @@ class _LoginState extends State<Login> {
         padding: EdgeInsets.fromLTRB(30.0, 15.0, 20.0, 15.0),
         onPressed: () {
           Navigator.push(context,
-              MaterialPageRoute(builder: (BuildContext context) => Register()));
+              MaterialPageRoute(builder: (BuildContext context) => RegisterPage()));
         },
         child: Text("Register",
             textAlign: TextAlign.center,
@@ -91,53 +71,76 @@ class _LoginState extends State<Login> {
                 color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
-
+Function validator = (value) {
+      if (value.isEmpty) {
+        return 'this field cant be empty';
+      }
+      return null;
+    };
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Center(
-            child: Container(
-              color: Colors.white,
-              child: Padding(
-                padding: const EdgeInsets.all(36.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      alignment: Alignment.bottomCenter,
-                      padding: EdgeInsets.all(5),
-                      child: Text(
-                        'QR attendance ',
-                        style: TextStyle(
-                            color: Colors.teal,
-                            fontWeight: FontWeight.w300,
-                            fontSize: 12),
-                      ),
+      body: Form(
+        key: formKey,
+              child: SafeArea(
+          child: ModalProgressHUD(
+            inAsyncCall: isLogin,
+                      child: SingleChildScrollView(
+              child: Center(
+                child: Container(
+                  color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(36.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          alignment: Alignment.bottomCenter,
+                          padding: EdgeInsets.all(5),
+                          child: Text(
+                            'QR attendance ',
+                            style: TextStyle(
+                                color: Colors.teal,
+                                fontWeight: FontWeight.w300,
+                                fontSize: 12),
+                          ),
+                        ),
+                        Container(
+                          child: Image.asset(
+                            "assets/images/logo.Jpg",
+                          ),
+                          height: 100,
+                          width: 200,
+                          alignment: Alignment.center,
+                        ),
+                        InputTextField(
+                              hintText: 'Email',
+                              textInputType: TextInputType.emailAddress,
+                              onChanged: (value) {
+                                email = value;
+                              },
+                              validator: validator,
+                            ),
+                           
+                            InputTextField(
+                              hintText: 'Password',
+                              textInputType: TextInputType.visiblePassword,
+                              isObscure: true,
+                              onChanged: (value) {
+                                password = value;
+                              },
+                              validator: validator,
+                            ),
+                        loginButton,
+                        SizedBox(
+                          height: 15.0,
+                        ),
+                        rigesterButton,
+                        SizedBox(
+                          height: 15.0,
+                        ),
+                      ],
                     ),
-                    Container(
-                      child: Image.asset(
-                        "assets/images/logo.Jpg",
-                      ),
-                      height: 100,
-                      width: 200,
-                      alignment: Alignment.center,
-                    ),
-                    textField,
-                    SizedBox(height: 10.0),
-                    passwordField,
-                    SizedBox(
-                      height: 10.0,
-                    ),
-                    loginButton,
-                    SizedBox(
-                      height: 15.0,
-                    ),
-                    rigesterButton,
-                    SizedBox(
-                      height: 15.0,
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),

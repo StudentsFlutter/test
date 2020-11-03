@@ -1,134 +1,65 @@
 import 'dart:ui';
 import 'dart:async';
-import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:students/pages/dashbord_page.dart';
-
-import 'package:toast/toast.dart';
-
+import 'package:students/widgets/input_text_field.dart';
 import 'login_page.dart';
 
-class Register extends StatefulWidget {
+class RegisterPage extends StatefulWidget {
   @override
-  _RegisterState createState() => _RegisterState();
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
-class _RegisterState extends State<Register> {
+class _RegisterPageState extends State<RegisterPage> {
   TextStyle style = TextStyle(fontFamily: 'Scholar', fontSize: 20.0);
-
-  TextEditingController ID = TextEditingController();
-  TextEditingController Name = TextEditingController();
-  TextEditingController Email = TextEditingController();
-  TextEditingController PhoneNumber = TextEditingController();
-  TextEditingController Level = TextEditingController();
-  TextEditingController Password = TextEditingController();
+  String id;
+  String name;
+  String email;
+  String phoneNumber;
+  String level;
+  String password;
+  bool isRegistering = false;
 
   Future register() async {
+    if (!formKey.currentState.validate()) return;
+    setState(() {
+      isRegistering = true;
+    });
+    await Firebase.initializeApp();
+    final FirebaseAuth _auth = FirebaseAuth.instance;
+    var user;
+    try {
+      user = (await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      ))
+          .user;
+    } catch (ex) {
+      user = null;
+    }
+    if (user != null) {
+      setState(() {
+        isRegistering = false;
+      });
+    } else {
+      setState(() {
+        isRegistering = false;
+      });
+      return;
+    }
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => DashBoard()),
     );
-    // var url = " http://192.168.64.2/PF/Register1.php"; //IMORTE
-    // var input = {
-    //   "ID ": ID.text,
-    //   "Name": Name.text,
-    //   "Email": Email.text,
-    //   "phoneNumber": PhoneNumber.text,
-    //   "Level": Level.text,
-    //   "Password": Password.text,
-    // };
-    // var body = json.encode(input);
-    // var response = await http.post(url, body: input);
-
-    // if (jsonDecode(response.body.toString()) == "Account already exists!") {
-    //   Toast.show("Username Exists. Please try again!", context,
-    //       duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
-    // } else {
-    //   if (jsonDecode(response.body.toString()) == "Success") {
-    //     Toast.show("Register Successful!", context,
-    //         duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
-    //     Navigator.push(
-    //       context,
-    //       MaterialPageRoute(builder: (context) => DashBoard()),
-    //     );
-    //   } else {
-    //     Toast.show("Error, Please try again!", context,
-    //         duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
-    //   }
-    // }
   }
 
+  final formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
-    // ignore: non_constant_identifier_names
-
-    final IdNumerField = TextField(
-      controller: ID,
-      obscureText: false,
-      style: style,
-      decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-          hintText: 'ID Number',
-          border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
-    );
-
-    final NameField = TextField(
-      controller: Name,
-      obscureText: false,
-      style: style,
-      decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-          hintText: 'Name',
-          border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
-    );
-
-    final EmailField = TextField(
-      controller: Email,
-      obscureText: false,
-      style: style,
-      decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-          hintText: 'Email',
-          border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
-    );
-
-    final phoneNumerField = TextField(
-      controller: PhoneNumber,
-      obscureText: false,
-      style: style,
-      decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-          hintText: 'Phone Number',
-          border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
-    );
-    final LevelField = TextField(
-      controller: Level,
-      obscureText: false,
-      style: style,
-      decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-          hintText: 'Are you Student or Teacher',
-          border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
-    );
-
-    final passwordField = TextField(
-      controller: Password,
-      obscureText: true,
-      style: style,
-      decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-          hintText: "Password",
-          border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
-    );
-
-    final RegisterButon = Material(
+    final registerButton = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(50.0),
       color: Colors.teal[200],
@@ -144,7 +75,7 @@ class _RegisterState extends State<Register> {
                 color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
-    final cancelButon = Material(
+    final cancelButton = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(50.0),
       color: Colors.teal[200],
@@ -154,7 +85,7 @@ class _RegisterState extends State<Register> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => Login()),
+            MaterialPageRoute(builder: (context) => LoginPage()),
           );
         },
         child: Text("CANCEL",
@@ -163,41 +94,78 @@ class _RegisterState extends State<Register> {
                 color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
+    Function validator = (value) {
+      if (value.isEmpty) {
+        return 'this field cant be empty';
+      }
+      return null;
+    };
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Center(
-            child: Container(
-              color: Colors.white,
-              child: Padding(
-                padding: const EdgeInsets.all(36.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    IdNumerField,
-                    SizedBox(height: 10.0),
-                    NameField,
-                    SizedBox(height: 10.0),
-                    EmailField,
-                    SizedBox(height: 10.0),
-                    phoneNumerField,
-                    SizedBox(height: 10.0),
-                    LevelField,
-                    SizedBox(height: 10.0),
-                    passwordField,
-                    SizedBox(
-                      height: 10.0,
+        child: ModalProgressHUD(
+          inAsyncCall: isRegistering,
+          child: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: Center(
+                child: Container(
+                  color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(36.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        InputTextField(
+                          hintText: 'ID',
+                          onChanged: (value) {
+                            id = value;
+                          },
+                          validator: validator,
+                        ),
+                        InputTextField(
+                          hintText: 'Name',
+                          onChanged: (value) {
+                            name = value;
+                          },
+                          validator: validator,
+                        ),
+                        InputTextField(
+                          hintText: 'Email',
+                          textInputType: TextInputType.emailAddress,
+                          onChanged: (value) {
+                            email = value;
+                          },
+                          validator: validator,
+                        ),
+                        InputTextField(
+                          hintText: 'Phone Number',
+                          textInputType: TextInputType.phone,
+                          onChanged: (value) {
+                            phoneNumber = value;
+                          },
+                          validator: validator,
+                        ),
+                        InputTextField(
+                          hintText: 'Password',
+                          textInputType: TextInputType.visiblePassword,
+                          isObscure: true,
+                          onChanged: (value) {
+                            password = value;
+                          },
+                          validator: validator,
+                        ),
+                        registerButton,
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        cancelButton,
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                      ],
                     ),
-                    RegisterButon,
-                    SizedBox(
-                      height: 10.0,
-                    ),
-                    cancelButon,
-                    SizedBox(
-                      height: 10.0,
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),

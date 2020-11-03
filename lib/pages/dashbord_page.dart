@@ -2,9 +2,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:students/pages/personal_info_page.dart';
-import 'package:students/weekly_timetable.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../calander.dart';
+import '../weekly_timetable.dart';
 
 class DashBoard extends StatefulWidget {
   @override

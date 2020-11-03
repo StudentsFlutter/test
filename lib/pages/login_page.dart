@@ -1,13 +1,12 @@
 import 'dart:ui';
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:students/pages/dashbord_page.dart';
 import 'package:students/widgets/input_text_field.dart';
 
-
 import 'Register_page.dart';
-
 
 class LoginPage extends StatefulWidget {
   @override
@@ -16,17 +15,41 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   TextStyle style = TextStyle(fontFamily: 'Scholar', fontSize: 20.0);
- final formKey = GlobalKey<FormState>();
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final formKey = GlobalKey<FormState>();
   String password;
   String email;
+
   Future login() async {
-      if (!formKey.currentState.validate()) return;
-    setState(() {
-      isLogin = true;
-    });
+    if (!formKey.currentState.validate()) return;
+    var user;
+    try {
+      user = (await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      ))
+          .user;
+    } catch (ex) {
+      print(ex);
+      user = null;
+    }
+    if (user != null) {
+      setState(() {
+        isLogin = true;
+      });
+    } else {
+      setState(() {
+        isLogin = false;
+      });
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => DashBoard()),
+    );
 
-
-    //if login 
+    //if login
     Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
@@ -34,10 +57,10 @@ class _LoginPageState extends State<LoginPage> {
         ),
         (r) => false);
   }
- bool isLogin = false;
+
+  bool isLogin = false;
   @override
   Widget build(BuildContext context) {
-   
     final loginButton = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(50.0),
@@ -62,8 +85,10 @@ class _LoginPageState extends State<LoginPage> {
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(30.0, 15.0, 20.0, 15.0),
         onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (BuildContext context) => RegisterPage()));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext context) => RegisterPage()));
         },
         child: Text("Register",
             textAlign: TextAlign.center,
@@ -71,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
                 color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
-Function validator = (value) {
+    Function validator = (value) {
       if (value.isEmpty) {
         return 'this field cant be empty';
       }
@@ -80,10 +105,10 @@ Function validator = (value) {
     return Scaffold(
       body: Form(
         key: formKey,
-              child: SafeArea(
+        child: SafeArea(
           child: ModalProgressHUD(
             inAsyncCall: isLogin,
-                      child: SingleChildScrollView(
+            child: SingleChildScrollView(
               child: Center(
                 child: Container(
                   color: Colors.white,
@@ -113,23 +138,22 @@ Function validator = (value) {
                           alignment: Alignment.center,
                         ),
                         InputTextField(
-                              hintText: 'Email',
-                              textInputType: TextInputType.emailAddress,
-                              onChanged: (value) {
-                                email = value;
-                              },
-                              validator: validator,
-                            ),
-                           
-                            InputTextField(
-                              hintText: 'Password',
-                              textInputType: TextInputType.visiblePassword,
-                              isObscure: true,
-                              onChanged: (value) {
-                                password = value;
-                              },
-                              validator: validator,
-                            ),
+                          hintText: 'Email',
+                          textInputType: TextInputType.emailAddress,
+                          onChanged: (value) {
+                            email = value;
+                          },
+                          validator: validator,
+                        ),
+                        InputTextField(
+                          hintText: 'Password',
+                          textInputType: TextInputType.visiblePassword,
+                          isObscure: true,
+                          onChanged: (value) {
+                            password = value;
+                          },
+                          validator: validator,
+                        ),
                         loginButton,
                         SizedBox(
                           height: 15.0,

@@ -1,16 +1,33 @@
 import 'dart:ui';
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:students/models/user.dart';
 import 'package:students/pages/dashbord_page.dart';
 import 'package:students/widgets/input_text_field.dart';
+import '../main.dart';
 import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
   _RegisterPageState createState() => _RegisterPageState();
+}
+
+final FirebaseAuth _auth = FirebaseAuth.instance;
+final userRef = Firestore.instance.collection('users');
+
+Future<UserM> fetch_user_firestore() async {
+  final snapshot = _auth.currentUser;
+
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
+  DocumentSnapshot doc = await userRef.document(snapshot.uid).get();
+  UserM userM = UserM.fromDocument(doc);
+  return userM;
 }
 
 class _RegisterPageState extends State<RegisterPage> {
@@ -23,13 +40,31 @@ class _RegisterPageState extends State<RegisterPage> {
   String password;
   bool isRegistering = false;
 
+  Future<void> firestore_reg() async {
+    final snapshot = await _auth.currentUser;
+
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp();
+    print("in store");
+    print(snapshot.uid);
+    await userRef.document(snapshot.uid).setData({
+      "Name": name, // change to name controller
+      "Email": snapshot.email, // change to email controller
+      "PhoneNumber": phoneNumber, // change to phone controller
+      "UserId": snapshot.uid, // change to user controller
+      "isStd": true, // change to bool controller
+      "Level": level,
+      // "Password": password,
+    });
+  }
+
   Future register() async {
     if (!formKey.currentState.validate()) return;
     setState(() {
       isRegistering = true;
     });
     await Firebase.initializeApp();
-    final FirebaseAuth _auth = FirebaseAuth.instance;
+
     var user;
     try {
       user = (await _auth.createUserWithEmailAndPassword(
@@ -38,6 +73,7 @@ class _RegisterPageState extends State<RegisterPage> {
       ))
           .user;
     } catch (ex) {
+      print(ex);
       user = null;
     }
     if (user != null) {
@@ -50,6 +86,7 @@ class _RegisterPageState extends State<RegisterPage> {
       });
       return;
     }
+    firestore_reg();
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => DashBoard()),

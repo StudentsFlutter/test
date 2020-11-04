@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:students/models/class.dart';
 import 'package:students/models/student_user.dart';
@@ -12,6 +14,27 @@ class SelectClassesPage extends StatefulWidget {
 }
 
 class _SelectClassesPageState extends State<SelectClassesPage> {
+  List<String> classNames = [];
+
+  getNames() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp();
+    await getClassesName(); //testing
+  }
+
+  getClassesName() async {
+    final classesRef = FirebaseFirestore.instance.collection('classes');
+
+    QuerySnapshot allNames = await classesRef.getDocuments();
+    for (int i = 0; i < allNames.docs.length; i++) {
+      var a = allNames.docs[i];
+      classNames.add(a['ClassName']);
+    }
+    classNames.forEach((element) {
+      print(element);
+    });
+  }
+
   List<Class> classesList = [
     Class(name: 'Math'),
     Class(name: 'Physics'),
@@ -26,9 +49,8 @@ class _SelectClassesPageState extends State<SelectClassesPage> {
     Class(name: 'Physics'),
     Class(name: 'Programming'),
   ];
-  List<bool> isPreList = [
-   
-  ];
+
+  List<bool> isPreList = [];
   List<Class> getCheckedClasses() {
     List<Class> checkedClassesList = [];
     for (int i = 0; i < isPreList.length; i++) {
@@ -74,55 +96,59 @@ class _SelectClassesPageState extends State<SelectClassesPage> {
         child: isLoading
             ? CircularProgressIndicator()
             : Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text('Select Your Classes',style: TextStyle(fontSize: 18),),
-                    Container(
-                      decoration: BoxDecoration(border: Border.all()),
-                      height: MediaQuery.of(context).size.height * .7,
-                      width: MediaQuery.of(context).size.width * .8,
-                      child: ListView.builder(
-            shrinkWrap: true,
-                         // physics: NeverScrollableScrollPhysics(),
-          //  padding: const EdgeInsets.all(5),
-            itemCount: classesList.length,
-            itemBuilder: (BuildContext context, int index) {
-              return ClassListTile(
-                classModel: classesList[index],
-                isPreChecked: isPreList[index],
-                onChange: (value) {
-                  setState(() {
-                    isPreList[index] = value;
-                  });
-                },
-              );
-            }),
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Select Your Classes',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(border: Border.all()),
+                    height: MediaQuery.of(context).size.height * .7,
+                    width: MediaQuery.of(context).size.width * .8,
+                    child: ListView.builder(
+                        shrinkWrap: true,
+                        // physics: NeverScrollableScrollPhysics(),
+                        //  padding: const EdgeInsets.all(5),
+                        itemCount: classesList.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return ClassListTile(
+                            classModel: classesList[index],
+                            isPreChecked: isPreList[index],
+                            onChange: (value) {
+                              setState(() {
+                                isPreList[index] = value;
+                              });
+                            },
+                          );
+                        }),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        RaisedButton(
+                          color: Theme.of(context).primaryColor,
+                          onPressed: () {
+                            widget.studentUser.classesList =
+                                getCheckedClasses();
+                            // save to firebase
+                          },
+                          child: Text('Save'),
+                        ),
+                        RaisedButton(
+                          color: Theme.of(context).primaryColor,
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text('Cancel'),
+                        ),
+                      ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          RaisedButton(
-                            color: Theme.of(context).primaryColor,
-            onPressed: () {
-              widget.studentUser.classesList = getCheckedClasses();
-              // save to firebase
-            },
-            child: Text('Save'),
-                          ),
-                          RaisedButton(
-                             color: Theme.of(context).primaryColor,
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: Text('Cancel'),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
+                  )
+                ],
+              ),
       ),
     );
   }

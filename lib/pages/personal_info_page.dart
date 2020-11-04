@@ -9,6 +9,9 @@ import 'package:url_launcher/url_launcher.dart' as launcher;
 const password = '********';
 
 class EditProfilePage extends StatefulWidget {
+  final StudentUser studentUser;
+
+  const EditProfilePage({Key key,@required this.studentUser}) : super(key: key);
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
 }
@@ -16,7 +19,7 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   _EditProfilePageState();
 
-  StudentUser user;
+  StudentUser user ;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final userRef = Firestore.instance.collection('users');
   Future<StudentUser> fetch_user_firestore() async {
@@ -70,7 +73,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   void initState() {
-    getUserData();
+  //  getUserData();
+  user = widget.studentUser;
     super.initState();
   }
 
@@ -151,11 +155,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20)),
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => DashBoard()),
-                            );
+                            Navigator.pop(context,);
                           },
                           child: Text("CANCEL",
                               style: TextStyle(

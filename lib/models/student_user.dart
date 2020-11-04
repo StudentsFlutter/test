@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:students/models/class.dart';
 
 class StudentUser {
   String id;
@@ -6,7 +7,7 @@ class StudentUser {
   String email;
   String phoneNumber;
   String level;
-
+  List<Class> classesList = [];
   StudentUser({this.id, this.name, this.email, this.phoneNumber, this.level});
 
   factory StudentUser.fromDocument(DocumentSnapshot doc) {

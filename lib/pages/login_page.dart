@@ -1,8 +1,11 @@
 import 'dart:ui';
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:students/models/student_user.dart';
 import 'package:students/pages/dashbord_page.dart';
 import 'package:students/widgets/input_text_field.dart';
 
@@ -37,7 +40,13 @@ class _LoginPageState extends State<LoginPage> {
       print(ex);
       user = null;
     }
+     StudentUser userM;
     if (user != null) {
+       final snapshot = user;
+    // WidgetsFlutterBinding.ensureInitialized();
+    // await Firebase.initializeApp();
+    DocumentSnapshot doc = await userRef.document(snapshot.uid).get();
+     userM = StudentUser.fromDocument(doc);
       setState(() {
         isLogin = false;
       });
@@ -50,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (BuildContext context) => DashBoard(),
+          builder: (BuildContext context) => DashBoard(studentUser: userM,),
         ),
         (r) => false);
   }
@@ -105,10 +114,9 @@ class _LoginPageState extends State<LoginPage> {
         child: SafeArea(
           child: ModalProgressHUD(
             inAsyncCall: isLogin,
-            child: SingleChildScrollView(
-              child: Center(
-                child: Container(
-                  color: Colors.white,
+            child: Center(
+              child: SingleChildScrollView(
+                child: Center(
                   child: Padding(
                     padding: const EdgeInsets.all(36.0),
                     child: Column(

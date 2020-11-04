@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:students/models/student_user.dart';
 import 'package:students/pages/dashbord_page.dart';
 import 'package:students/widgets/input_text_field.dart';
 import 'login_page.dart';
@@ -71,10 +73,17 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
     firestore_reg();
+    StudentUser studentUser = StudentUser(
+      email: email,
+      id: id,
+      phoneNumber: phoneNumber,
+      level: '5',
+      name: name
+    );
     Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (BuildContext context) => DashBoard(),
+          builder: (BuildContext context) => DashBoard(studentUser: studentUser,),
         ),
         (r) => false);
   }
@@ -127,12 +136,11 @@ class _RegisterPageState extends State<RegisterPage> {
       body: SafeArea(
         child: ModalProgressHUD(
           inAsyncCall: isRegistering,
-          child: SingleChildScrollView(
-            child: Form(
-              key: formKey,
-              child: Center(
-                child: Container(
-                  color: Colors.white,
+          child: Center(
+            child: SingleChildScrollView(
+              child: Form(
+                key: formKey,
+                child: Center(
                   child: Padding(
                     padding: const EdgeInsets.all(36.0),
                     child: Column(

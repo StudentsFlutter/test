@@ -2,9 +2,9 @@ import 'dart:ui';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:students/models/class.dart';
 import 'package:students/models/student_user.dart';
 import 'package:students/pages/dashbord_page.dart';
 import 'package:students/widgets/input_text_field.dart';
@@ -26,7 +26,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future login() async {
     if (!formKey.currentState.validate()) return;
-     setState(() {
+    setState(() {
       isLogin = true;
     });
     var user;
@@ -40,13 +40,24 @@ class _LoginPageState extends State<LoginPage> {
       print(ex);
       user = null;
     }
-     StudentUser userM;
+    StudentUser userM;
     if (user != null) {
-       final snapshot = user;
-    // WidgetsFlutterBinding.ensureInitialized();
-    // await Firebase.initializeApp();
-    DocumentSnapshot doc = await userRef.document(snapshot.uid).get();
-     userM = StudentUser.fromDocument(doc);
+      final snapshot = user;
+      DocumentSnapshot doc = await userRef.document(snapshot.uid).get();
+      List<String> classesIds = doc['classesIds'].cast<String>();
+       List<Class> classNames = [];
+      for (String id in classesIds) {
+       print(id);
+        final classesRef = FirebaseFirestore.instance
+            .collection('classes')
+            .doc(id);
+            var nameDoc = await classesRef.get();
+            String name = nameDoc['ClassName'];
+          
+            classNames.add(Class(name:name, id: classesRef.id));
+      
+      }
+      userM = StudentUser.fromDocument(doc,classNames);
       setState(() {
         isLogin = false;
       });
@@ -59,7 +70,9 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (BuildContext context) => DashBoard(studentUser: userM,),
+          builder: (BuildContext context) => DashBoard(
+            studentUser: userM,
+          ),
         ),
         (r) => false);
   }

@@ -1,9 +1,7 @@
-import 'dart:math';
 import 'dart:ui';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:students/models/student_user.dart';
@@ -33,7 +31,6 @@ class _RegisterPageState extends State<RegisterPage> {
     final snapshot = await _auth.currentUser;
 
     WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp();
     await userRef.document(snapshot.uid).setData({
       "Name": name,
       "Email": snapshot.email,
@@ -41,6 +38,7 @@ class _RegisterPageState extends State<RegisterPage> {
       "UserId": id,
       "isStd": true,
       "Level": level,
+      "classesIds" : [],
     });
   }
 
@@ -49,7 +47,6 @@ class _RegisterPageState extends State<RegisterPage> {
     setState(() {
       isRegistering = true;
     });
-    await Firebase.initializeApp();
 
     var user;
     try {
@@ -78,7 +75,8 @@ class _RegisterPageState extends State<RegisterPage> {
       id: id,
       phoneNumber: phoneNumber,
       level: '5',
-      name: name
+      name: name,
+      classesList: []
     );
     Navigator.pushAndRemoveUntil(
         context,

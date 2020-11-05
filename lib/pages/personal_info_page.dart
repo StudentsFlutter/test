@@ -1,9 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+
 import 'package:flutter/material.dart';
 import 'package:students/models/student_user.dart';
-import 'package:students/pages/dashbord_page.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
 const password = '********';
@@ -20,18 +17,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   _EditProfilePageState();
 
   StudentUser user ;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final userRef = Firestore.instance.collection('users');
-  Future<StudentUser> fetch_user_firestore() async {
-    final snapshot = _auth.currentUser;
-
-    WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp();
-
-    DocumentSnapshot doc = await userRef.document(snapshot.uid).get();
-    StudentUser userM = StudentUser.fromDocument(doc);
-    return userM;
-  }
+  
 
   void _showDialog(BuildContext context, {String title, String msg}) {
     final dialog = AlertDialog(
@@ -55,21 +41,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     showDialog(context: context, builder: (x) => dialog);
   }
 
-  void getUserData() async {
-    setState(() {
-      isLoading = true;
-    });
-    try {
-      user = await fetch_user_firestore();
-      setState(() {
-        isLoading = false;
-      });
-    } catch (ex) {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
+  
 
   @override
   void initState() {

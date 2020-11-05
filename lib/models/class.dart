@@ -2,7 +2,7 @@ import 'package:students/models/attendance.dart';
 
 class Class{
 String name;
-int id;
+ String id;
 List<Attendace> attendaceList = []; // store only id of attendace on firebase
-Class({this.name});
+Class({this.name,this.id});
 }

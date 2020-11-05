@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:students/models/student_user.dart';
+import 'package:students/pages/add_classes_page.dart';
 import 'package:students/pages/first_page.dart';
 import 'package:students/pages/personal_info_page.dart';
 import 'package:students/widgets/drawer_item.dart';
@@ -28,7 +29,6 @@ class _DashBoardState extends State<DashBoard> {
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
     bool islogingOut = false;
     return Scaffold(
       appBar: AppBar(
@@ -39,7 +39,8 @@ class _DashBoardState extends State<DashBoard> {
           UserAccountsDrawerHeader(
             accountEmail: Text(widget.studentUser.email),
             accountName: Text(widget.studentUser.name),
-            currentAccountPicture: Image.asset('assets/images/female-profile.png' ),
+            currentAccountPicture:
+                Image.asset('assets/images/female-profile.png'),
           ),
           DrawerItem(
             text: 'Log Out',
@@ -64,6 +65,19 @@ class _DashBoardState extends State<DashBoard> {
               }
             },
           ),
+          DrawerItem(
+            text: 'select classes',
+            icon: Icons.select_all,
+            onTap: () async {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => SelectClassesPage(
+                          studentUser: widget.studentUser,
+                        )),
+              );
+            },
+          ),
         ]),
       ),
       body: SafeArea(
@@ -81,7 +95,6 @@ class _DashBoardState extends State<DashBoard> {
                     crossAxisCount: 2,
                     children: <Widget>[
                       DashboardCard(
-                        
                         text: 'Personal info.',
                         imagePath: 'assets/images/personal_information.png',
                         onPressed: () {

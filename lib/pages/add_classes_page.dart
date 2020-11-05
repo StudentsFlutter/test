@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:students/models/class.dart';
 import 'package:students/models/student_user.dart';
@@ -14,42 +14,19 @@ class SelectClassesPage extends StatefulWidget {
 }
 
 class _SelectClassesPageState extends State<SelectClassesPage> {
-  List<String> classNames = [];
-
-  getNames() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp();
-    await getClassesName(); //testing
-  }
-
-  getClassesName() async {
+  Future<List<Class>> getClassesName() async {
+    List<Class> classNames = [];
     final classesRef = FirebaseFirestore.instance.collection('classes');
-
     QuerySnapshot allNames = await classesRef.getDocuments();
     for (int i = 0; i < allNames.docs.length; i++) {
       var a = allNames.docs[i];
-      classNames.add(a['ClassName']);
+
+      classNames.add(Class(name: a['ClassName'], id: a.id));
     }
-    classNames.forEach((element) {
-      print(element);
-    });
+    return classNames;
   }
 
-  List<Class> classesList = [
-    Class(name: 'Math'),
-    Class(name: 'Physics'),
-    Class(name: 'Programming'),
-    Class(name: 'Math'),
-    Class(name: 'Physics'),
-    Class(name: 'Programming'),
-    Class(name: 'Math'),
-    Class(name: 'Physics'),
-    Class(name: 'Programming'),
-    Class(name: 'Math'),
-    Class(name: 'Physics'),
-    Class(name: 'Programming'),
-  ];
-
+  List<Class> classesList;
   List<bool> isPreList = [];
   List<Class> getCheckedClasses() {
     List<Class> checkedClassesList = [];
@@ -61,17 +38,22 @@ class _SelectClassesPageState extends State<SelectClassesPage> {
     return checkedClassesList;
   }
 
-  void setLists() {
+  Future<void> setLists() async {
     setState(() {
       isLoading = true;
     });
 
-    // classesList = await getFromFireBase(); //
+    classesList = await getClassesName();
     for (Class c in classesList) {
-      if (widget.studentUser.classesList.contains(c))
-        isPreList.add(true);
-      else
-        isPreList.add(false);
+      bool b = false;
+      for (Class studentClass in widget.studentUser.classesList) {
+        if (c.id == studentClass.id) {
+          isPreList.add(true);
+          b = true;
+          break;
+        }
+      }
+      if (!b) isPreList.add(false);
     }
     setState(() {
       isLoading = false;
@@ -81,7 +63,6 @@ class _SelectClassesPageState extends State<SelectClassesPage> {
   @override
   void initState() {
     setLists();
-
     super.initState();
   }
 
@@ -94,7 +75,7 @@ class _SelectClassesPageState extends State<SelectClassesPage> {
       ),
       body: SafeArea(
         child: isLoading
-            ? CircularProgressIndicator()
+            ? Center(child: CircularProgressIndicator())
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -104,12 +85,10 @@ class _SelectClassesPageState extends State<SelectClassesPage> {
                   ),
                   Container(
                     decoration: BoxDecoration(border: Border.all()),
-                    height: MediaQuery.of(context).size.height * .7,
+                    height: MediaQuery.of(context).size.height * .65,
                     width: MediaQuery.of(context).size.width * .8,
                     child: ListView.builder(
                         shrinkWrap: true,
-                        // physics: NeverScrollableScrollPhysics(),
-                        //  padding: const EdgeInsets.all(5),
                         itemCount: classesList.length,
                         itemBuilder: (BuildContext context, int index) {
                           return ClassListTile(
@@ -130,10 +109,21 @@ class _SelectClassesPageState extends State<SelectClassesPage> {
                       children: [
                         RaisedButton(
                           color: Theme.of(context).primaryColor,
-                          onPressed: () {
+                          onPressed: () async {
                             widget.studentUser.classesList =
                                 getCheckedClasses();
+                                final userRef = Firestore.instance.collection('users');
+                                final FirebaseAuth _auth = FirebaseAuth.instance;
+                                final snapshot = await _auth.currentUser;
+                                List<String> idsArray = [];
+                                for (Class c in   widget.studentUser.classesList){
+                                   idsArray.add( c.id);
+                                }
+                            await userRef.document(snapshot.uid).update({
+                              "classesIds": idsArray,
+                            });
                             // save to firebase
+                             Navigator.pop(context);
                           },
                           child: Text('Save'),
                         ),

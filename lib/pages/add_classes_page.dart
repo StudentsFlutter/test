@@ -112,18 +112,19 @@ class _SelectClassesPageState extends State<SelectClassesPage> {
                           onPressed: () async {
                             widget.studentUser.classesList =
                                 getCheckedClasses();
-                                final userRef = Firestore.instance.collection('users');
-                                final FirebaseAuth _auth = FirebaseAuth.instance;
-                                final snapshot = await _auth.currentUser;
-                                List<String> idsArray = [];
-                                for (Class c in   widget.studentUser.classesList){
-                                   idsArray.add( c.id);
-                                }
+                            final userRef =
+                                Firestore.instance.collection('users');
+                            final FirebaseAuth _auth = FirebaseAuth.instance;
+                            final snapshot = await _auth.currentUser;
+                            List<String> idsArray = [];
+                            for (Class c in widget.studentUser.classesList) {
+                              idsArray.add(c.id);
+                            }
                             await userRef.document(snapshot.uid).update({
                               "classesIds": idsArray,
                             });
                             // save to firebase
-                             Navigator.pop(context);
+                            Navigator.pop(context);
                           },
                           child: Text('Save'),
                         ),

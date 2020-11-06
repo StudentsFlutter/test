@@ -71,6 +71,7 @@ class _RegisterPageState extends State<RegisterPage> {
     }
     firestore_reg();
     StudentUser studentUser = StudentUser(
+      firebaseID: user.uid,
       email: email,
       id: id,
       phoneNumber: phoneNumber,
@@ -81,7 +82,7 @@ class _RegisterPageState extends State<RegisterPage> {
     Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (BuildContext context) => DashBoard(studentUser: studentUser,),
+          builder: (BuildContext context) => DashBoard(studentUser: studentUser,isFromRegister: true,),
         ),
         (r) => false);
   }

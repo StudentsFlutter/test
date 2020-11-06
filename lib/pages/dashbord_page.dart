@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:students/models/student_user.dart';
 import 'package:students/pages/add_classes_page.dart';
+import 'package:students/pages/attendance_page.dart';
 import 'package:students/pages/first_page.dart';
 import 'package:students/pages/personal_info_page.dart';
 import 'package:students/widgets/drawer_item.dart';
@@ -12,8 +14,12 @@ import 'package:url_launcher/url_launcher.dart';
 
 class DashBoard extends StatefulWidget {
   final StudentUser studentUser;
-
-  const DashBoard({Key key, @required this.studentUser}) : super(key: key);
+  final bool isFromRegister;
+  const DashBoard({
+    Key key,
+    @required this.studentUser,
+    @required this.isFromRegister,
+  }) : super(key: key);
   @override
   _DashBoardState createState() => _DashBoardState();
 }
@@ -24,6 +30,21 @@ class _DashBoardState extends State<DashBoard> {
       await launch(command);
     } else {
       print(' could not launch $command');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isFromRegister) {
+      Timer.run(() {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  SelectClassesPage(studentUser: widget.studentUser)),
+        );
+      });
     }
   }
 
@@ -118,7 +139,13 @@ class _DashBoardState extends State<DashBoard> {
                         text: 'Attendance',
                         imagePath: 'assets/images/att.png',
                         onPressed: () {
-                          print('Att');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AttendancePage(
+                                      studentUser: widget.studentUser,
+                                    )),
+                          );
                         },
                       ),
                       DashboardCard(

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:students/models/attendance.dart';
 import 'package:students/models/class.dart';
 import 'package:students/models/student_user.dart';
 import 'package:students/pages/dashbord_page.dart';
@@ -23,7 +24,34 @@ class _LoginPageState extends State<LoginPage> {
   final formKey = GlobalKey<FormState>();
   String password;
   String email;
+  Future<List<Attendace>> getAttendaceList (List<String> attendaceIds) async {
+     List<Attendace> attendaceList = [];
+      for (String id in attendaceIds){
+            final attendance = FirebaseFirestore.instance
+            .collection('attendance')
+            .doc(id);
+             var doc = await attendance.get();
+              List<String> studentsArray = doc['studentsArray'].cast<String>();
+            String date = doc['date'];
+            attendaceList.add(Attendace(studentsList: studentsArray,date: date));
+      }
+     return attendaceList;
+  }
+Future<List<Class>> getStudentCLasses(String uid, DocumentSnapshot doc) async {
+      List<String> classesIds = doc['classesIds'].cast<String>();
+       List<Class> classes = [];
+      for (String id in classesIds) {
+        final classesRef = FirebaseFirestore.instance
+            .collection('classes')
+            .doc(id);
+            var nameDoc = await classesRef.get();
+            String name = nameDoc['ClassName'];
+            List<String> attendaceIds = nameDoc['attendaceIdsList'].cast<String>();
+            classes.add(Class(name:name, id: classesRef.id,attendaceList:await getAttendaceList(attendaceIds)));
 
+      }
+      return classes;
+}
   Future login() async {
     if (!formKey.currentState.validate()) return;
     setState(() {
@@ -42,22 +70,8 @@ class _LoginPageState extends State<LoginPage> {
     }
     StudentUser userM;
     if (user != null) {
-      final snapshot = user;
-      DocumentSnapshot doc = await userRef.document(snapshot.uid).get();
-      List<String> classesIds = doc['classesIds'].cast<String>();
-       List<Class> classNames = [];
-      for (String id in classesIds) {
-       print(id);
-        final classesRef = FirebaseFirestore.instance
-            .collection('classes')
-            .doc(id);
-            var nameDoc = await classesRef.get();
-            String name = nameDoc['ClassName'];
-          
-            classNames.add(Class(name:name, id: classesRef.id));
-      
-      }
-      userM = StudentUser.fromDocument(doc,classNames);
+      DocumentSnapshot doc = await userRef.doc(user.uid).get();
+      userM = StudentUser.fromDocument(doc,await getStudentCLasses(user.uid,doc),user.uid);
       setState(() {
         isLogin = false;
       });
@@ -72,6 +86,7 @@ class _LoginPageState extends State<LoginPage> {
         MaterialPageRoute(
           builder: (BuildContext context) => DashBoard(
             studentUser: userM,
+            isFromRegister: false,
           ),
         ),
         (r) => false);

@@ -7,6 +7,7 @@ import 'package:students/pages/dashbord_page.dart';
 import 'package:students/pages/first_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:students/pages/qr_code_generator.dart';
 import 'package:students/pages/temp.dart';
 
 void main() => runApp(MyApp());
@@ -47,7 +48,7 @@ class _MyAppState extends State<MyApp> {
       //   firebaseID: 'j7ejRAOqM9hjqqlNEhkUyuaUxLC2',
       // ),
       // ) : FirstPage()
-      home: QrScanner(),
+      home: isLoading ? Container () : QrCodeGeneratorPage() ,
       // home : QrScannerPage( studentUser:
       //   StudentUser(
       //   email: 'rahaf@gmail.com',

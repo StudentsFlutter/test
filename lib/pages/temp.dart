@@ -160,7 +160,7 @@ class _QrScannerState extends State<QrScanner> {
                             onTap: () async {
                               final success = await ImageGallerySaver.saveImage(this.bytes);
                               SnackBar snackBar;
-                              if (success) {
+                              if (success!= null) {
                                 snackBar = new SnackBar(content: new Text('Successful Preservation!'));
                                 Scaffold.of(context).showSnackBar(snackBar);
                               } else {

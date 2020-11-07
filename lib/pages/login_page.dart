@@ -9,8 +9,11 @@ import 'package:students/models/class.dart';
 import 'package:students/models/student_user.dart';
 import 'package:students/pages/dashbord_page.dart';
 import 'package:students/widgets/input_text_field.dart';
+import 'package:toast/toast.dart';
 
 import 'Register_page.dart';
+
+enum authProblems { UserNotFound, PasswordNotValid, NetworkError, AlReadyInUse }
 
 class LoginPage extends StatefulWidget {
   @override
@@ -24,34 +27,38 @@ class _LoginPageState extends State<LoginPage> {
   final formKey = GlobalKey<FormState>();
   String password;
   String email;
-  Future<List<Attendance>> getAttendaceList (List<String> attendaceIds) async {
-     List<Attendance> attendaceList = [];
-      for (String id in attendaceIds){
-            final attendance = FirebaseFirestore.instance
-            .collection('attendance')
-            .doc(id);
-             var doc = await attendance.get();
-              List<String> studentsArray = doc['studentsArray'].cast<String>();
-            String date = doc['date'];
-            attendaceList.add(Attendance(id: attendance.id,studentsList: studentsArray,date: date));
-      }
-     return attendaceList;
+  Future<List<Attendance>> getAttendaceList(List<String> attendaceIds) async {
+    List<Attendance> attendaceList = [];
+    for (String id in attendaceIds) {
+      final attendance =
+          FirebaseFirestore.instance.collection('attendance').doc(id);
+      var doc = await attendance.get();
+      List<String> studentsArray = doc['studentsArray'].cast<String>();
+      String date = doc['date'];
+      attendaceList.add(Attendance(
+          id: attendance.id, studentsList: studentsArray, date: date));
+    }
+    return attendaceList;
   }
-Future<List<Class>> getStudentCLasses(String uid, DocumentSnapshot doc) async {
-      List<String> classesIds = doc['classesIds'].cast<String>();
-       List<Class> classes = [];
-      for (String id in classesIds) {
-        final classesRef = FirebaseFirestore.instance
-            .collection('classes')
-            .doc(id);
-            var nameDoc = await classesRef.get();
-            String name = nameDoc['ClassName'];
-            List<String> attendaceIds = nameDoc['attendaceIdsList'].cast<String>();
-            classes.add(Class(name:name, id: classesRef.id,attendaceList:await getAttendaceList(attendaceIds)));
 
-      }
-      return classes;
-}
+  Future<List<Class>> getStudentCLasses(
+      String uid, DocumentSnapshot doc) async {
+    List<String> classesIds = doc['classesIds'].cast<String>();
+    List<Class> classes = [];
+    for (String id in classesIds) {
+      final classesRef =
+          FirebaseFirestore.instance.collection('classes').doc(id);
+      var nameDoc = await classesRef.get();
+      String name = nameDoc['ClassName'];
+      List<String> attendaceIds = nameDoc['attendaceIdsList'].cast<String>();
+      classes.add(Class(
+          name: name,
+          id: classesRef.id,
+          attendaceList: await getAttendaceList(attendaceIds)));
+    }
+    return classes;
+  }
+
   Future login() async {
     if (!formKey.currentState.validate()) return;
     setState(() {
@@ -59,19 +66,43 @@ Future<List<Class>> getStudentCLasses(String uid, DocumentSnapshot doc) async {
     });
     var user;
     try {
-      user = (await _auth.signInWithEmailAndPassword(
+      final status = (await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
-      ))
-          .user;
+      ));
+      user = status.user;
     } catch (ex) {
       print(ex);
+      authProblems errorType;
+      String errorString;
+      switch (ex.message) {
+        case 'There is no user record corresponding to this identifier. The user may have been deleted.':
+          errorType = authProblems.UserNotFound;
+          errorString = "User Not Found";
+          break;
+        case 'The password is invalid or the user does not have a password.':
+          errorType = authProblems.PasswordNotValid;
+          errorString = "Password Not Valid";
+          break;
+        case 'A network error (such as timeout, interrupted connection or unreachable host) has occurred.':
+          errorType = authProblems.NetworkError;
+          errorString = "Network Error";
+          break;
+        // ...
+        default:
+          print('Case ${ex.message} is not jet implemented');
+      }
+
+      Toast.show(errorString, context,
+          duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
+
       user = null;
     }
     StudentUser userM;
     if (user != null) {
       DocumentSnapshot doc = await userRef.doc(user.uid).get();
-      userM = StudentUser.fromDocument(doc,await getStudentCLasses(user.uid,doc),user.uid);
+      userM = StudentUser.fromDocument(
+          doc, await getStudentCLasses(user.uid, doc), user.uid);
       setState(() {
         isLogin = false;
       });

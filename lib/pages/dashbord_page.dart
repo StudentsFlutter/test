@@ -11,6 +11,7 @@ import 'package:students/pages/first_page.dart';
 import 'package:students/pages/personal_info_page.dart';
 import 'package:students/pages/qr_scanner_page.dart';
 import 'package:students/pages/temp.dart';
+import 'package:students/pages/time_table_page.dart';
 import 'package:students/widgets/drawer_item.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -160,7 +161,13 @@ class _DashBoardState extends State<DashBoard> {
                         text: 'weekly Schedule',
                         imagePath: 'assets/images/attendance.png',
                         onPressed: () {
-                          print('weekly Schedule');
+                           Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => TablePage(
+                                      studentUser: widget.studentUser,
+                                    )),
+                          );
                         },
                       ),
                       DashboardCard(

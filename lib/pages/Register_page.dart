@@ -7,6 +7,7 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:students/models/student_user.dart';
 import 'package:students/pages/dashbord_page.dart';
 import 'package:students/widgets/input_text_field.dart';
+import 'package:toast/toast.dart';
 import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -38,7 +39,7 @@ class _RegisterPageState extends State<RegisterPage> {
       "UserId": id,
       "isStd": true,
       "Level": level,
-      "classesIds" : [],
+      "classesIds": [],
     });
   }
 
@@ -58,6 +59,23 @@ class _RegisterPageState extends State<RegisterPage> {
     } catch (ex) {
       print(ex);
       user = null;
+      authProblems errorType;
+      String errorString;
+      switch (ex.message) {
+        case 'The email address is already in use by another account.':
+          errorType = authProblems.AlReadyInUse;
+          errorString = "Email already in use";
+          break;
+        case 'A network error (such as timeout, interrupted connection or unreachable host) has occurred.':
+          errorType = authProblems.NetworkError;
+          errorString = "Network Error";
+          break;
+        // ...
+        default:
+          print('Case ${ex.message} is not jet implemented');
+      }
+      Toast.show(errorString, context,
+          duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
     }
     if (user != null) {
       setState(() {
@@ -71,18 +89,20 @@ class _RegisterPageState extends State<RegisterPage> {
     }
     firestore_reg();
     StudentUser studentUser = StudentUser(
-      firebaseID: user.uid,
-      email: email,
-      id: id,
-      phoneNumber: phoneNumber,
-      level: '5',
-      name: name,
-      classesList: []
-    );
+        firebaseID: user.uid,
+        email: email,
+        id: id,
+        phoneNumber: phoneNumber,
+        level: '5',
+        name: name,
+        classesList: []);
     Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (BuildContext context) => DashBoard(studentUser: studentUser,isFromRegister: true,),
+          builder: (BuildContext context) => DashBoard(
+            studentUser: studentUser,
+            isFromRegister: true,
+          ),
         ),
         (r) => false);
   }

@@ -2,8 +2,10 @@ import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
+import 'package:students/models/attendance.dart';
 import 'package:students/models/class.dart';
 
 class QrCodeGeneratorPage extends StatefulWidget {
@@ -12,6 +14,19 @@ class QrCodeGeneratorPage extends StatefulWidget {
 }
 
 class _QrCodeGeneratorPageState extends State<QrCodeGeneratorPage> {
+   Future<List<Attendance>> getAttendaceList(List<String> attendaceIds) async {
+    List<Attendance> attendaceList = [];
+    for (String id in attendaceIds) {
+      final attendance =
+          FirebaseFirestore.instance.collection('attendance').doc(id);
+      var doc = await attendance.get();
+      List<String> studentsArray = doc['studentsArray'].cast<String>();
+      String date = doc['date'];
+      attendaceList.add(Attendance(
+          id: attendance.id, studentsList: studentsArray, date: date));
+    }
+    return attendaceList;
+  }
   bool isLoading = false;
   getClassesList() async {
     setState(() {
@@ -22,8 +37,11 @@ class _QrCodeGeneratorPageState extends State<QrCodeGeneratorPage> {
     QuerySnapshot allNames = await classesRef.getDocuments();
     for (int i = 0; i < allNames.docs.length; i++) {
       var a = allNames.docs[i];
-
-      classNames.add(Class(name: a['ClassName'], id: a.id));
+    List<String> attendaceIds = a['attendaceIdsList'].cast<String>();
+      classNames.add(Class(name: a['ClassName'], id: a.id,
+      attendaceList: await getAttendaceList(attendaceIds),
+      
+      ));
     }
     classesList = classNames;
     setState(() {
@@ -37,13 +55,21 @@ class _QrCodeGeneratorPageState extends State<QrCodeGeneratorPage> {
     super.initState();
   }
 
-  List<Class> classesList = [
-    Class(name: 'hi', id: 'kkgkgk'),
-  ];
+  List<Class> classesList = [];
   Class currentClass;
   Uint8List bytes = Uint8List(0);
-  Future _generateBarCode(String inputCode) async {
-    Uint8List result = await scanner.generateBarCode(inputCode);
+  Future _generateBarCode(String classId, String attendanceId) async {
+    DateTime timeNow = DateTime.now();
+    String time =
+        '${timeNow.year}-${timeNow.month}-${timeNow.day} ${timeNow.hour}:${timeNow.minute}:${timeNow.second}';
+
+         Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+        String positionString = '${position.latitude},${position.longitude}';
+    // 'u%!code@KhFsF7Ni3yM78aaM5K2A@BJ@2020-11-07 03:39:00@33.5026435,36.3159059'
+    String code = '$attendanceId@$classId@$time@$positionString';
+    print(code);
+    Uint8List result = await scanner.generateBarCode(code);
     this.setState(() => this.bytes = result);
   }
 
@@ -57,9 +83,28 @@ class _QrCodeGeneratorPageState extends State<QrCodeGeneratorPage> {
           ? Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                _qrCodeWidget(bytes, context),
+                _qrCodeWidget(bytes, context, () async {
+                  var ref =
+                      FirebaseFirestore.instance.collection('attendance');
+                  var now = DateTime.now();
+                  String date = '${now.day}/${now.month}/${now.year}';
+                  var doc = await ref.add({"date": date, "studentsArray": []});
+                  currentClass.attendaceList.add(Attendance(
+                    id: doc.id,
+                    date: date,
+                    studentsList: [],
+                  ));
+                  final classRef = FirebaseFirestore.instance.collection('classes');
+                  List attendaceIdsList = [];
+                  for (Attendance attendance in  currentClass.attendaceList)
+                    attendaceIdsList.add(attendance.id);
+                   await classRef.doc(currentClass.id).update({
+                    "attendaceIdsList":  attendaceIdsList
+                     });            
+                  _generateBarCode(currentClass.id, doc.id);
+                }),
                 DropdownButton(
-                  hint: Text('السنة'),
+                  hint: Text('Select class to generate QR code for it'),
                   value: currentClass,
                   onChanged: (newValue) {
                     setState(() {
@@ -69,7 +114,7 @@ class _QrCodeGeneratorPageState extends State<QrCodeGeneratorPage> {
                   items: classesList.map((c) {
                     return DropdownMenuItem(
                       child: new Text(c.name),
-                      value: c.id,
+                      value: c,
                     );
                   }).toList(),
                 ),
@@ -78,7 +123,8 @@ class _QrCodeGeneratorPageState extends State<QrCodeGeneratorPage> {
     );
   }
 
-  Widget _qrCodeWidget(Uint8List bytes, BuildContext context) {
+  Widget _qrCodeWidget(
+      Uint8List bytes, BuildContext context, Function onPressed) {
     return Padding(
       padding: EdgeInsets.all(20),
       child: Card(
@@ -91,7 +137,7 @@ class _QrCodeGeneratorPageState extends State<QrCodeGeneratorPage> {
             ),
             Padding(
               padding:
-                  EdgeInsets.only(left: 40, right: 40, top: 30, bottom: 10),
+                  EdgeInsets.only(left: 20, right: 20, top: 30, bottom: 10),
               child: Column(
                 children: <Widget>[
                   SizedBox(
@@ -104,51 +150,55 @@ class _QrCodeGeneratorPageState extends State<QrCodeGeneratorPage> {
                         : Image.memory(bytes),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(top: 7, left: 25, right: 25),
+                    padding: EdgeInsets.only(top: 7, left: 5, right: 5),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
-                        Expanded(
-                          flex: 5,
-                          child: GestureDetector(
-                            child: Text(
-                              'remove',
-                              style:
-                                  TextStyle(fontSize: 15, color: Colors.blue),
-                              textAlign: TextAlign.left,
-                            ),
-                            onTap: () =>
-                                this.setState(() => this.bytes = Uint8List(0)),
+                        RaisedButton(
+                          child: Text(
+                            'remove',
+                            style: TextStyle(fontSize: 15, color: Colors.teal),
+                            textAlign: TextAlign.left,
                           ),
+                          onPressed: () =>
+                              this.setState(() => this.bytes = Uint8List(0)),
                         ),
-                        Text('|',
-                            style:
-                                TextStyle(fontSize: 15, color: Colors.black26)),
-                        Expanded(
-                          flex: 5,
-                          child: GestureDetector(
-                            onTap: () async {
-                              final success =
-                                  await ImageGallerySaver.saveImage(this.bytes);
-                              SnackBar snackBar;
-                              if (success != null) {
-                                snackBar = new SnackBar(
-                                    content:
-                                        new Text('Successful Preservation!'));
-                                Scaffold.of(context).showSnackBar(snackBar);
-                              } else {
-                                snackBar = new SnackBar(
-                                    content: new Text('Save failed!'));
-                              }
-                            },
-                            child: Text(
-                              'save',
-                              style:
-                                  TextStyle(fontSize: 15, color: Colors.blue),
-                              textAlign: TextAlign.right,
-                            ),
+                        RaisedButton(
+                          child: Text(
+                            'Confirm',
+                            style: TextStyle(fontSize: 15, color: Colors.teal),
+                            textAlign: TextAlign.left,
                           ),
+                          onPressed: onPressed,
                         ),
+                        // Text('|',
+                        //     style:
+                        //         TextStyle(fontSize: 15, color: Colors.black26)),
+                        // Expanded(
+                        //   flex: 5,
+                        //   child: GestureDetector(
+                        //     onTap: () async {
+                        //       final success =
+                        //           await ImageGallerySaver.saveImage(this.bytes);
+                        //       SnackBar snackBar;
+                        //       if (success != null) {
+                        //         snackBar = new SnackBar(
+                        //             content:
+                        //                 new Text('Successful Preservation!'));
+                        //         Scaffold.of(context).showSnackBar(snackBar);
+                        //       } else {
+                        //         snackBar = new SnackBar(
+                        //             content: new Text('Save failed!'));
+                        //       }
+                        //     },
+                        //     child: Text(
+                        //       'save',
+                        //       style:
+                        //           TextStyle(fontSize: 15, color: Colors.blue),
+                        //       textAlign: TextAlign.right,
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   )

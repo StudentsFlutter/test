@@ -158,11 +158,11 @@ class _QrScannerPageState extends State<QrScannerPage> {
 
   Future<void> scanCheck(String code) async {
     List<String> splitCode = code.split('@');
-    if (splitCode.length == 5 && splitCode[0] == 'u%!code') {
-      String attendanceId = splitCode[1];
-      String classId = splitCode[2];
-      String time = splitCode[3];
-      String location = splitCode[4];
+    if (splitCode.length == 4) {
+      String attendanceId = splitCode[0];
+      String classId = splitCode[1];
+      String time = splitCode[2];
+      String location = splitCode[3];
       if (await timeAndLocationCheck(time, location)) {
         if (await addAttendance(attendanceId, classId)) {
           setState(() {

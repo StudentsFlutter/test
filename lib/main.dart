@@ -7,7 +7,7 @@ import 'package:students/pages/dashbord_page.dart';
 import 'package:students/pages/first_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:students/pages/qr_scanner_page.dart';
+import 'package:students/pages/temp.dart';
 
 void main() => runApp(MyApp());
 
@@ -37,17 +37,17 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(primarySwatch: Colors.teal),
-      home: isLoading ? Container() : isLogin ? DashBoard(
-      studentUser: StudentUser(
-        email: 'rahaf@gmail.com',
-        name:  'Rahaf Khaled',
-        level:  '5',
-        id: '30030',
-        phoneNumber: '054863736',
-        firebaseID: 'j7ejRAOqM9hjqqlNEhkUyuaUxLC2',
-      ),
-      isFromRegister: true,
-      ) : FirstPage()
+      // home: isLoading ? Container() : isLogin ? DashBoard(
+      // studentUser: StudentUser(
+      //   email: 'rahaf@gmail.com',
+      //   name:  'Rahaf Khaled',
+      //   level:  '5',
+      //   id: '30030',
+      //   phoneNumber: '054863736',
+      //   firebaseID: 'j7ejRAOqM9hjqqlNEhkUyuaUxLC2',
+      // ),
+      // ) : FirstPage()
+      home: QrScanner(),
       // home : QrScannerPage( studentUser:
       //   StudentUser(
       //   email: 'rahaf@gmail.com',

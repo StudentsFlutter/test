@@ -63,7 +63,7 @@ class TableListTile extends StatefulWidget {
 
 class _TableListTileState extends State<TableListTile> {
   List<TimeForClass> tfcL = [];
-  init() async {
+ void init() async {
     final temp = await getTimesListForClass(widget.classModel.id);
     setState(() {
       tfcL = temp;

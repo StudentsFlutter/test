@@ -11,16 +11,17 @@ import 'package:students/pages/first_page.dart';
 import 'package:students/pages/personal_info_page.dart';
 import 'package:students/pages/qr_scanner_page.dart';
 import 'package:students/pages/temp.dart';
+import 'package:students/pages/time_table_page.dart';
 import 'package:students/widgets/drawer_item.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DashBoard extends StatefulWidget {
   final StudentUser studentUser;
-  final bool isFromRegister;
+  final bool isTeacher;
   const DashBoard({
     Key key,
-    @required this.studentUser,
-    @required this.isFromRegister,
+    @required this.studentUser,@required this.isTeacher,
+    
   }) : super(key: key);
   @override
   _DashBoardState createState() => _DashBoardState();
@@ -143,7 +144,7 @@ class _DashBoardState extends State<DashBoard> {
                           );
                         },
                       ),
-                      DashboardCard(
+                 widget.isTeacher ?     DashboardCard(
                         text: 'Attendance',
                         imagePath: 'assets/images/att.png',
                         onPressed: () {
@@ -155,19 +156,26 @@ class _DashBoardState extends State<DashBoard> {
                                     )),
                           );
                         },
-                      ),
-                      DashboardCard(
+                      ) : Container(),
+                  widget.isTeacher ?  DashboardCard(
                         text: 'weekly Schedule',
                         imagePath: 'assets/images/attendance.png',
                         onPressed: () {
-                          print('weekly Schedule');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => TablePage(
+                                      studentUser: widget.studentUser,
+                                    )),
+                          );
                         },
-                      ),
+                      ) : Container(),
                       DashboardCard(
                         text: 'Academic Calender',
                         imagePath: 'assets/images/weekly_schedual.png',
                         onPressed: () {
-                          print('Academic Calender');
+                           customLaunch(
+                              'https://www.pnu.edu.sa/ar/Pages/UniversityCalender.aspx');
                         },
                       ),
                       DashboardCard(

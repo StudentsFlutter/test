@@ -1,14 +1,87 @@
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:students/models/student_user.dart';
+import 'package:students/widgets/input_text_field.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
-const password = '********';
+const password = '**********';
+
+///BY THEMaker
+class EditDialog extends StatefulWidget {
+  bool important;
+  EditDialog({this.important});
+  @override
+  _EditDialogState createState() => _EditDialogState();
+}
+
+///BY THEMaker
+class _EditDialogState extends State<EditDialog> {
+  void _changePassword(String password) async {
+    //Create an instance of the current user.
+    final _auth = FirebaseAuth.instance;
+    final user = await _auth.currentUser;
+    //Pass in the password to updatePassword.
+    user.updatePassword(password).then((_) {
+      print("Successfully changed password");
+    }).catchError((error) {
+      print("Password can't be changed" + error.toString());
+      //This might happen, when the wrong password is in, the user isn't found, or if the user hasn't logged in recently.
+    });
+  }
+
+  String newpass = "";
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Center(
+        child: Text(
+          'change password',
+        ),
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InputTextField(
+            hintText: 'Password',
+            textInputType: TextInputType.visiblePassword,
+            isObscure: true,
+            onChanged: (value) {
+              newpass = value;
+            },
+          )
+        ],
+      ),
+      actions: <Widget>[
+        Row(
+          children: <Widget>[
+            FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  'Cancel',
+                )),
+            FlatButton(
+              onPressed: () {
+                _changePassword(newpass);
+                Navigator.pop(context);
+              },
+              child: Text(
+                'Save',
+              ),
+            ),
+          ],
+        )
+      ],
+    );
+  }
+}
 
 class EditProfilePage extends StatefulWidget {
   final StudentUser studentUser;
 
-  const EditProfilePage({Key key,@required this.studentUser}) : super(key: key);
+  const EditProfilePage({Key key, @required this.studentUser})
+      : super(key: key);
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
 }
@@ -16,8 +89,7 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   _EditProfilePageState();
 
-  StudentUser user ;
-  
+  StudentUser user;
 
   void _showDialog(BuildContext context, {String title, String msg}) {
     final dialog = AlertDialog(
@@ -41,12 +113,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
     showDialog(context: context, builder: (x) => dialog);
   }
 
-  
-
   @override
   void initState() {
-  //  getUserData();
-  user = widget.studentUser;
+    //  getUserData();
+    user = widget.studentUser;
     super.initState();
   }
 
@@ -115,6 +185,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         text: password,
                         icon: Icons.card_membership,
                         onPressed: () async {
+                          ///BY THEMaker
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return EditDialog();
+                              });
+
                           // String removeSpaceFromPhoneNumber =
                           //     phone.replaceAll(new RegExp(r"\s+\b|\b\s"), "");
                           // final password = 'password';
@@ -127,7 +204,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20)),
                           onPressed: () {
-                            Navigator.pop(context,);
+                            Navigator.pop(
+                              context,
+                            );
                           },
                           child: Text("CANCEL",
                               style: TextStyle(

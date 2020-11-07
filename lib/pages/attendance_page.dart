@@ -46,7 +46,7 @@ class AttendanceListTile extends StatefulWidget {
 class _AttendanceListTileState extends State<AttendanceListTile> {
   @override
   Widget build(BuildContext context) {
-   
+   if(widget.classModel.attendaceList==null) print('object');
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
@@ -85,7 +85,7 @@ class _AttendanceListTileState extends State<AttendanceListTile> {
 
 class AttendanceCard extends StatelessWidget {
   final Class classModel;
-  final Attendace attendace;
+  final Attendance attendace;
   final bool isAttended;
 
   const AttendanceCard(

@@ -7,6 +7,7 @@ import 'package:students/pages/dashbord_page.dart';
 import 'package:students/pages/first_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:students/pages/qr_scanner_page.dart';
 
 void main() => runApp(MyApp());
 
@@ -42,10 +43,21 @@ class _MyAppState extends State<MyApp> {
         name:  'Rahaf Khaled',
         level:  '5',
         id: '30030',
-        phoneNumber: '054863736'
+        phoneNumber: '054863736',
+        firebaseID: 'j7ejRAOqM9hjqqlNEhkUyuaUxLC2',
       ),
       isFromRegister: true,
       ) : FirstPage()
+      // home : QrScannerPage( studentUser:
+      //   StudentUser(
+      //   email: 'rahaf@gmail.com',
+      //   name:  'Rahaf Khaled',
+      //   level:  '5',
+      //   id: '30030',
+      //   phoneNumber: '054863736',
+      //   firebaseID: 'StudentUser'
+      // ),
+      // )
       // home: AttendancePage(
       //   studentUser: StudentUser(firebaseID: '1', classesList: [
       //     Class(name: 'test', attendaceList: [

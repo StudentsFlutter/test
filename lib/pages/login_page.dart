@@ -24,8 +24,8 @@ class _LoginPageState extends State<LoginPage> {
   final formKey = GlobalKey<FormState>();
   String password;
   String email;
-  Future<List<Attendace>> getAttendaceList (List<String> attendaceIds) async {
-     List<Attendace> attendaceList = [];
+  Future<List<Attendance>> getAttendaceList (List<String> attendaceIds) async {
+     List<Attendance> attendaceList = [];
       for (String id in attendaceIds){
             final attendance = FirebaseFirestore.instance
             .collection('attendance')
@@ -33,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
              var doc = await attendance.get();
               List<String> studentsArray = doc['studentsArray'].cast<String>();
             String date = doc['date'];
-            attendaceList.add(Attendace(studentsList: studentsArray,date: date));
+            attendaceList.add(Attendance(id: attendance.id,studentsList: studentsArray,date: date));
       }
      return attendaceList;
   }

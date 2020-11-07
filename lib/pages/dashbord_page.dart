@@ -9,6 +9,8 @@ import 'package:students/pages/add_classes_page.dart';
 import 'package:students/pages/attendance_page.dart';
 import 'package:students/pages/first_page.dart';
 import 'package:students/pages/personal_info_page.dart';
+import 'package:students/pages/qr_scanner_page.dart';
+import 'package:students/pages/temp.dart';
 import 'package:students/widgets/drawer_item.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -36,16 +38,16 @@ class _DashBoardState extends State<DashBoard> {
   @override
   void initState() {
     super.initState();
-    if (widget.isFromRegister) {
-      Timer.run(() {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  SelectClassesPage(studentUser: widget.studentUser)),
-        );
-      });
-    }
+    // if (widget.isFromRegister) {
+    //   Timer.run(() {
+    //     Navigator.push(
+    //       context,
+    //       MaterialPageRoute(
+    //           builder: (context) =>
+    //               SelectClassesPage(studentUser: widget.studentUser)),
+    //     );
+    //   });
+    // }
   }
 
   @override
@@ -86,19 +88,19 @@ class _DashBoardState extends State<DashBoard> {
               }
             },
           ),
-          DrawerItem(
-            text: 'select classes',
-            icon: Icons.select_all,
-            onTap: () async {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => SelectClassesPage(
-                          studentUser: widget.studentUser,
-                        )),
-              );
-            },
-          ),
+          // DrawerItem(
+          //   text: 'select classes',
+          //   icon: Icons.select_all,
+          //   onTap: () async {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //           builder: (context) => SelectClassesPage(
+          //                 studentUser: widget.studentUser,
+          //               )),
+          //     );
+          //   },
+          // ),
         ]),
       ),
       body: SafeArea(
@@ -132,7 +134,13 @@ class _DashBoardState extends State<DashBoard> {
                         text: 'QR code Scanner',
                         imagePath: 'assets/images/qrcode.reader.png',
                         onPressed: () {
-                          print('QR');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => QrScannerPage(
+                                      studentUser: widget.studentUser,
+                                    )),
+                          );
                         },
                       ),
                       DashboardCard(

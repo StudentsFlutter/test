@@ -38,17 +38,18 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(primarySwatch: Colors.teal),
-      // home: isLoading ? Container() : isLogin ? DashBoard(
-      // studentUser: StudentUser(
-      //   email: 'rahaf@gmail.com',
-      //   name:  'Rahaf Khaled',
-      //   level:  '5',
-      //   id: '30030',
-      //   phoneNumber: '054863736',
-      //   firebaseID: 'j7ejRAOqM9hjqqlNEhkUyuaUxLC2',
-      // ),
-      // ) : FirstPage()
-      home: isLoading ? Container () : QrCodeGeneratorPage() ,
+      home: isLoading ? Container() : isLogin ? DashBoard(
+        isTeacher: false,
+      studentUser: StudentUser(
+        email: 'rahaf@gmail.com',
+        name:  'Rahaf Khaled',
+        level:  '5',
+        id: '30030',
+        phoneNumber: '054863736',
+        firebaseID: 'j7ejRAOqM9hjqqlNEhkUyuaUxLC2',
+      ),
+      ) : FirstPage()
+     //home: isLoading ? Container () : QrCodeGeneratorPage() ,
       // home : QrScannerPage( studentUser:
       //   StudentUser(
       //   email: 'rahaf@gmail.com',
@@ -59,22 +60,7 @@ class _MyAppState extends State<MyApp> {
       //   firebaseID: 'StudentUser'
       // ),
       // )
-      // home: AttendancePage(
-      //   studentUser: StudentUser(firebaseID: '1', classesList: [
-      //     Class(name: 'test', attendaceList: [
-      //       Attendace(studentsList: ['1'],date: '8/10/2020'),
-      //       Attendace(studentsList: ['3'],date: '5/11/2020')
-      //     ]),
-      //     //  Class(name: 'test 2', attendaceList: [
-      //     //   Attendace(studentsList: ['1']),
-      //     //   Attendace(studentsList: ['3'])
-      //     // ]),
-      //     //  Class(name: 'test', attendaceList: [
-      //     //   Attendace(studentsList: ['1']),
-      //     //   Attendace(studentsList: ['3'])
-      //     // ]),
-      //   ]),
-      // ),
+   
     );
   }
 }

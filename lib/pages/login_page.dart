@@ -16,6 +16,9 @@ import 'Register_page.dart';
 enum authProblems { UserNotFound, PasswordNotValid, NetworkError, AlReadyInUse }
 
 class LoginPage extends StatefulWidget {
+  final bool isTeacher;
+
+  const LoginPage({Key key,@required this.isTeacher}) : super(key: key);
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -42,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<List<Class>> getStudentCLasses(
-      String uid, DocumentSnapshot doc) async {
+       DocumentSnapshot doc) async {
     List<String> classesIds = doc['classesIds'].cast<String>();
     List<Class> classes = [];
     for (String id in classesIds) {
@@ -102,7 +105,7 @@ class _LoginPageState extends State<LoginPage> {
     if (user != null) {
       DocumentSnapshot doc = await userRef.doc(user.uid).get();
       userM = StudentUser.fromDocument(
-          doc, await getStudentCLasses(user.uid, doc), user.uid);
+          doc, user.uid);
       setState(() {
         isLogin = false;
       });
@@ -117,6 +120,7 @@ class _LoginPageState extends State<LoginPage> {
         MaterialPageRoute(
           builder: (BuildContext context) => DashBoard(
             studentUser: userM,
+            isTeacher: widget.isTeacher,
           ),
         ),
         (r) => false);
@@ -152,7 +156,7 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (BuildContext context) => RegisterPage()));
+                  builder: (BuildContext context) => RegisterPage(isTeacher: widget.isTeacher,)));
         },
         child: Text("Register",
             textAlign: TextAlign.center,

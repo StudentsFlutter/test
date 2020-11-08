@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:students/models/attendance.dart';
 import 'package:students/models/class.dart';
 import 'package:students/models/student_user.dart';
+import 'package:students/pages/Register_page.dart';
 
 class AttendancePage extends StatefulWidget {
   final StudentUser studentUser;
@@ -12,13 +14,56 @@ class AttendancePage extends StatefulWidget {
 }
 
 class _AttendancePageState extends State<AttendancePage> {
+   Future<List<Attendance>> getAttendaceList(List<String> attendaceIds) async {
+    List<Attendance> attendaceList = [];
+    for (String id in attendaceIds) {
+      final attendance =
+          FirebaseFirestore.instance.collection('attendance').doc(id);
+      var doc = await attendance.get();
+      List<String> studentsArray = doc['studentsArray'].cast<String>();
+      String date = doc['date'];
+      attendaceList.add(Attendance(
+          id: attendance.id, studentsList: studentsArray, date: date));
+    }
+    return attendaceList;
+  }
+   Future<List<Class>> getStudentCLasses( DocumentSnapshot doc) async {
+    List<String> classesIds = doc['classesIds'].cast<String>();
+    List<Class> classes = [];
+    for (String id in classesIds) {
+      final classesRef =
+          FirebaseFirestore.instance.collection('classes').doc(id);
+      var nameDoc = await classesRef.get();
+      String name = nameDoc['ClassName'];
+      List<String> attendaceIds = nameDoc['attendaceIdsList'].cast<String>();
+      classes.add(Class(
+          name: name,
+          id: classesRef.id,
+          attendaceList: await getAttendaceList(attendaceIds)));
+    }
+    return classes;
+  }
+  Future<void> getAttendance() async {
+     DocumentSnapshot doc = await userRef.doc(widget.studentUser.firebaseID).get();
+   widget.studentUser.classesList = await getStudentCLasses( doc);
+    
+    setState(() {
+      isLoading = false;
+    });
+  }
+  @override
+  void initState() {
+    getAttendance();
+    super.initState();
+  }
+  bool isLoading = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Text('Your Attendace List'),
         ),
-        body: Padding(
+        body: isLoading ? Center(child: CircularProgressIndicator(),) : Padding(
           padding: const EdgeInsets.only(top: 28.0),
           child: ListView.builder(
             shrinkWrap: true,

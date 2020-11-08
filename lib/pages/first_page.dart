@@ -29,7 +29,7 @@ class FirstPageState extends State<FirstPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
+                  MaterialPageRoute(builder: (context) => LoginPage(isTeacher: true,)),
                 );
               },
             ),
@@ -46,7 +46,7 @@ class FirstPageState extends State<FirstPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
+                  MaterialPageRoute(builder: (context) => LoginPage(isTeacher: false,)),
                 );
               },
             ),

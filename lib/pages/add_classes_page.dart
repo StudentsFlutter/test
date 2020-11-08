@@ -17,7 +17,7 @@ class _SelectClassesPageState extends State<SelectClassesPage> {
   Future<List<Class>> getClassesName() async {
     List<Class> classNames = [];
     final classesRef = FirebaseFirestore.instance.collection('classes');
-    QuerySnapshot allNames = await classesRef.getDocuments();
+    QuerySnapshot allNames = await classesRef.get();
     for (int i = 0; i < allNames.docs.length; i++) {
       var a = allNames.docs[i];
 

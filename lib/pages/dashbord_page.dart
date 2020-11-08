@@ -9,6 +9,7 @@ import 'package:students/pages/add_classes_page.dart';
 import 'package:students/pages/attendance_page.dart';
 import 'package:students/pages/first_page.dart';
 import 'package:students/pages/personal_info_page.dart';
+import 'package:students/pages/qr_code_generator.dart';
 import 'package:students/pages/qr_scanner_page.dart';
 import 'package:students/pages/temp.dart';
 import 'package:students/pages/time_table_page.dart';
@@ -131,7 +132,18 @@ class _DashBoardState extends State<DashBoard> {
                           );
                         },
                       ),
-                      DashboardCard(
+                  widget.isTeacher ?DashboardCard(
+                        text: 'QR code Scanner',
+                        imagePath: 'assets/images/qrcode.reader.png',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => QrCodeGeneratorPage(
+                                    )),
+                          );
+                        },
+                      )    : DashboardCard(
                         text: 'QR code Scanner',
                         imagePath: 'assets/images/qrcode.reader.png',
                         onPressed: () {
@@ -143,8 +155,8 @@ class _DashBoardState extends State<DashBoard> {
                                     )),
                           );
                         },
-                      ),
-                 widget.isTeacher ?     DashboardCard(
+                      )   ,
+                 widget.isTeacher ? Container() :    DashboardCard(
                         text: 'Attendance',
                         imagePath: 'assets/images/att.png',
                         onPressed: () {
@@ -156,8 +168,8 @@ class _DashBoardState extends State<DashBoard> {
                                     )),
                           );
                         },
-                      ) : Container(),
-                  widget.isTeacher ?  DashboardCard(
+                      )  ,
+                  widget.isTeacher ? Container() : DashboardCard(
                         text: 'weekly Schedule',
                         imagePath: 'assets/images/attendance.png',
                         onPressed: () {
@@ -169,7 +181,7 @@ class _DashBoardState extends State<DashBoard> {
                                     )),
                           );
                         },
-                      ) : Container(),
+                      )  ,
                       DashboardCard(
                         text: 'Academic Calender',
                         imagePath: 'assets/images/weekly_schedual.png',

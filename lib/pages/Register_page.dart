@@ -11,6 +11,9 @@ import 'package:toast/toast.dart';
 import 'login_page.dart';
 
 class RegisterPage extends StatefulWidget {
+  final bool isTeacher;
+
+  const RegisterPage({Key key, @required this.isTeacher}) : super(key: key);
   @override
   _RegisterPageState createState() => _RegisterPageState();
 }
@@ -101,6 +104,7 @@ class _RegisterPageState extends State<RegisterPage> {
         MaterialPageRoute(
           builder: (BuildContext context) => DashBoard(
             studentUser: studentUser,
+            isTeacher: widget.isTeacher,
           ),
         ),
         (r) => false);
@@ -133,9 +137,8 @@ class _RegisterPageState extends State<RegisterPage> {
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(30.0, 15.0, 20.0, 15.0),
         onPressed: () {
-          Navigator.push(
+          Navigator.pop(
             context,
-            MaterialPageRoute(builder: (context) => LoginPage()),
           );
         },
         child: Text("CANCEL",

@@ -55,7 +55,7 @@ if (widget.isTeacher)
                         },
                       ),
                 DashboardCard(
-                        text: 'QR code Scanner',
+                        text: 'QR Code Generator',
                         imagePath: 'assets/images/qrcode.reader.png',
                         onPressed: () {
                           Navigator.push(

@@ -153,6 +153,27 @@ class _RegisterPageState extends State<RegisterPage> {
       }
       return null;
     };
+     Function passValidator = (value) {
+      if (value.isEmpty) {
+        return 'this field cant be empty';
+      } else if (value.length < 6) {
+        return 'Password must be more than 5 characters';
+      }
+
+      return null;
+    };
+    Function emailValidator = (value) {
+      bool emailValid = RegExp(
+              r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+          .hasMatch(value);
+      if (value.isEmpty) {
+        return 'this field cant be empty';
+      } else if (!emailValid) {
+        return 'Email format not valid';
+      }
+
+      return null;
+    };
     return Scaffold(
       body: SafeArea(
         child: ModalProgressHUD(
@@ -188,7 +209,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           onChanged: (value) {
                             email = value;
                           },
-                          validator: validator,
+                          validator: emailValidator,
                         ),
                         InputTextField(
                           hintText: 'Phone Number',
@@ -205,7 +226,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           onChanged: (value) {
                             password = value;
                           },
-                          validator: validator,
+                          validator: passValidator,
                         ),
                         registerButton,
                         SizedBox(

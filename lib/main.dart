@@ -1,14 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:students/models/attendance.dart';
-import 'package:students/models/class.dart';
-import 'package:students/models/student_user.dart';
-import 'package:students/pages/attendance_page.dart';
-import 'package:students/pages/dashbord_page.dart';
 import 'package:students/pages/first_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:students/pages/qr_code_generator.dart';
-import 'package:students/pages/temp.dart';
 
 void main() => runApp(MyApp());
 
@@ -24,7 +17,6 @@ class _MyAppState extends State<MyApp> {
     super.initState();
   }
 
-  bool isLogin = false;
   bool isLoading = true;
   Future<void> init() async {
     await Firebase.initializeApp();
@@ -38,29 +30,8 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(primarySwatch: Colors.teal),
-      home: isLoading ? Container() : isLogin ? DashBoard(
-        isTeacher: false,
-      studentUser: StudentUser(
-        email: 'rahaf@gmail.com',
-        name:  'Rahaf Khaled',
-        level:  '5',
-        id: '30030',
-        phoneNumber: '054863736',
-        firebaseID: 'j7ejRAOqM9hjqqlNEhkUyuaUxLC2',
-      ),
-      ) : FirstPage()
-     //home: isLoading ? Container () : QrCodeGeneratorPage() ,
-      // home : QrScannerPage( studentUser:
-      //   StudentUser(
-      //   email: 'rahaf@gmail.com',
-      //   name:  'Rahaf Khaled',
-      //   level:  '5',
-      //   id: '30030',
-      //   phoneNumber: '054863736',
-      //   firebaseID: 'StudentUser'
-      // ),
-      // )
-   
+      home: isLoading ? Container() :  FirstPage()
+    
     );
   }
 }

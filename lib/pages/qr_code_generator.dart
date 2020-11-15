@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
 import 'package:students/models/attendance.dart';
 import 'package:students/models/class.dart';
@@ -34,11 +34,13 @@ class _QrCodeGeneratorPageState extends State<QrCodeGeneratorPage> {
     });
     List<Class> classNames = [];
     final classesRef = FirebaseFirestore.instance.collection('classes');
-    QuerySnapshot allNames = await classesRef.getDocuments();
+    QuerySnapshot allNames = await classesRef.get();
     for (int i = 0; i < allNames.docs.length; i++) {
       var a = allNames.docs[i];
     List<String> attendaceIds = a['attendaceIdsList'].cast<String>();
-      classNames.add(Class(name: a['ClassName'], id: a.id,
+      classNames.add(Class(
+        name: a['className'], id: a.id,
+        division: a['division'],
       attendaceList: await getAttendaceList(attendaceIds),
       
       ));
@@ -66,12 +68,12 @@ class _QrCodeGeneratorPageState extends State<QrCodeGeneratorPage> {
          Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
         String positionString = '${position.latitude},${position.longitude}';
-    // 'u%!code@KhFsF7Ni3yM78aaM5K2A@BJ@2020-11-07 03:39:00@33.5026435,36.3159059'
     String code = '$attendanceId@$classId@$time@$positionString';
     print(code);
     Uint8List result = await scanner.generateBarCode(code);
-    this.setState(() => this.bytes = result);
+    setState(() { this.bytes = result;});
   }
+  bool isGenerating = false;
 
   @override
   Widget build(BuildContext context) {
@@ -81,45 +83,54 @@ class _QrCodeGeneratorPageState extends State<QrCodeGeneratorPage> {
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                _qrCodeWidget(bytes, context, () async {
-                  var ref =
-                      FirebaseFirestore.instance.collection('attendance');
-                  var now = DateTime.now();
-                  String date = '${now.day}/${now.month}/${now.year}';
-                  var doc = await ref.add({"date": date, "studentsArray": []});
-                  currentClass.attendaceList.add(Attendance(
-                    id: doc.id,
-                    date: date,
-                    studentsList: [],
-                  ));
-                  final classRef = FirebaseFirestore.instance.collection('classes');
-                  List attendaceIdsList = [];
-                  for (Attendance attendance in  currentClass.attendaceList)
-                    attendaceIdsList.add(attendance.id);
-                   await classRef.doc(currentClass.id).update({
-                    "attendaceIdsList":  attendaceIdsList
-                     });            
-                  _generateBarCode(currentClass.id, doc.id);
-                }),
-                DropdownButton(
-                  hint: Text('Select class to generate QR code for it'),
-                  value: currentClass,
-                  onChanged: (newValue) {
+          : ModalProgressHUD(
+            inAsyncCall: isGenerating,
+                      child: Column(
+                children: [
+                  _qrCodeWidget(bytes, context, () async {
                     setState(() {
-                      currentClass = newValue;
+                      isGenerating = true;
                     });
-                  },
-                  items: classesList.map((c) {
-                    return DropdownMenuItem(
-                      child: new Text(c.name),
-                      value: c,
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
+                    var ref =
+                        FirebaseFirestore.instance.collection('attendance');
+                    var now = DateTime.now();
+                    String date = '${now.day}/${now.month}/${now.year}';
+                    var doc = await ref.add({"date": date, "studentsArray": []});
+                    currentClass.attendaceList.add(Attendance(
+                      id: doc.id,
+                      date: date,
+                      studentsList: [],
+                    ));
+                    final classRef = FirebaseFirestore.instance.collection('classes');
+                    List attendaceIdsList = [];
+                    for (Attendance attendance in  currentClass.attendaceList)
+                      attendaceIdsList.add(attendance.id);
+                     await classRef.doc(currentClass.id).update({
+                      "attendaceIdsList":  attendaceIdsList
+                       });            
+                    _generateBarCode(currentClass.id, doc.id);
+                    setState(() {
+                       isGenerating = false;
+                    });
+                  }),
+                  DropdownButton(
+                    hint: Text('Select class to generate QR code for it'),
+                    value: currentClass,
+                    onChanged: (newValue) {
+                      setState(() {
+                        currentClass = newValue;
+                      });
+                    },
+                    items: classesList.map((c) {
+                      return DropdownMenuItem(
+                        child: new Text(c.name+" - " +c.division),
+                        value: c,
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+          ),
     );
   }
 
@@ -165,7 +176,7 @@ class _QrCodeGeneratorPageState extends State<QrCodeGeneratorPage> {
                         ),
                         RaisedButton(
                           child: Text(
-                            'Confirm',
+                            'Generate',
                             style: TextStyle(fontSize: 15, color: Colors.teal),
                             textAlign: TextAlign.left,
                           ),

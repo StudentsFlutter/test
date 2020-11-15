@@ -23,9 +23,10 @@ class QrScannerPage extends StatefulWidget {
 class _QrScannerPageState extends State<QrScannerPage> {
   Uint8List bytes = Uint8List(0);
   TextEditingController _outputController;
-
+  bool isLoading;
   @override
   initState() {
+    
     super.initState();
     this._outputController = new TextEditingController();
   }
@@ -143,28 +144,41 @@ class _QrScannerPageState extends State<QrScannerPage> {
         break;
       }
     }
+    print(1) ;
     if (classModel == null) return false;
     // find attendance
-    Attendance attendance;
-    for (Attendance a in classModel.attendaceList) {
-      if (a.id == attendacneID) {
-        attendance = a;
-        break;
-      }
-    }
-    if (attendance == null) return false;
+    // Attendance attendance;
+    // for (Attendance a in classModel.attendaceList) {
+    //   if (a.id == attendacneID) {
+    //     attendance = a;
+    //     break;
+    //   }
+    // }
+    print(2);
+   // if (attendance == null) return false;
     this.classModel = classModel;
-    if (!attendance.studentsList.contains(widget.studentUser.firebaseID)) {
-      attendance.studentsList.add(widget.studentUser.firebaseID);
+     final attendance =
+          FirebaseFirestore.instance.collection('attendance').doc(attendacneID);
+if (attendance == null) return false;
+          var doc = await attendance.get();
+          if (doc == null) return false;
+      List<String> studentsArray = doc['studentsArray'].cast<String>();
+    studentsArray.add(widget.studentUser.firebaseID);
+  //  if (!attendance.studentsList.contains(widget.studentUser.firebaseID)) {
+
+   //   attendance.studentsList.add(widget.studentUser.firebaseID);
       final userRef = FirebaseFirestore.instance.collection('attendance');
       await userRef.doc(attendacneID).update({
-        "studentsArray": attendance.studentsList,
+        "studentsArray":studentsArray,
       });
-    }
+   // }
     return true;
   }
 
   Future<void> scanCheck(String code) async {
+    print(code);
+    for (Class c in widget.studentUser.classesList)
+    print(c.id);
     setState(() {
       isWaiting = true;
       isScanned = false;
@@ -175,7 +189,6 @@ class _QrScannerPageState extends State<QrScannerPage> {
       String attendanceId = splitCode[0];
       String classId = splitCode[1];
       String time = splitCode[2];
-      print(time);
       String location = splitCode[3];
       if (await timeAndLocationCheck(time, location)) {
         if (await addAttendance(attendanceId, classId)) {

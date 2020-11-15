@@ -11,7 +11,6 @@ import 'package:students/pages/first_page.dart';
 import 'package:students/pages/personal_info_page.dart';
 import 'package:students/pages/qr_code_generator.dart';
 import 'package:students/pages/qr_scanner_page.dart';
-import 'package:students/pages/temp.dart';
 import 'package:students/pages/time_table_page.dart';
 import 'package:students/widgets/drawer_item.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -37,21 +36,127 @@ class _DashBoardState extends State<DashBoard> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    // if (widget.isFromRegister) {
-    //   Timer.run(() {
-    //     Navigator.push(
-    //       context,
-    //       MaterialPageRoute(
-    //           builder: (context) =>
-    //               SelectClassesPage(studentUser: widget.studentUser)),
-    //     );
-    //   });
-    // }
-  }
+ 
+ List<Widget> widgets (){
+if (widget.isTeacher) 
+                      return  [
+                      DashboardCard(
+                        text: 'Personal info.',
+                        imagePath: 'assets/images/personal_information.png',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => EditProfilePage(
+                                      studentUser: widget.studentUser,
+                                      isTeacher: widget.isTeacher,
+                                    )),
+                          );
+                        },
+                      ),
+                DashboardCard(
+                        text: 'QR code Scanner',
+                        imagePath: 'assets/images/qrcode.reader.png',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => QrCodeGeneratorPage(
+                                    )),
+                          );
+                        },
+                      ),
+                      DashboardCard(
+                        text: 'Academic Calender',
+                        imagePath: 'assets/images/weekly_schedual.png',
+                        onPressed: () {
+                           customLaunch(
+                              'https://www.pnu.edu.sa/ar/Pages/UniversityCalender.aspx');
+                        },
+                      ),
+                      DashboardCard(
+                        text: 'technical Support',
+                        imagePath: 'assets/images/support.png',
+                        onPressed: () {
+                          customLaunch(
+                              'mailto:graduation.7wk@gmail.com ?subject=test%20subject&body=test%20body');
+                        },
+                      ),
+                    ];
+                    else return [
+  DashboardCard(
+                        text: 'Personal info.',
+                        imagePath: 'assets/images/personal_information.png',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => EditProfilePage(
+                                      studentUser: widget.studentUser,
+                                      isTeacher: widget.isTeacher,
+                                    )),
+                          );
+                        },
+                      ),
+                DashboardCard(
+                        text: 'QR code Scanner',
+                        imagePath: 'assets/images/qrcode.reader.png',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => QrScannerPage(
+                                      studentUser: widget.studentUser,
+                                    )),
+                          );
+                        },
+                      )   ,
+                   DashboardCard(
+                        text: 'Attendance',
+                        imagePath: 'assets/images/att.png',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AttendancePage(
+                                      studentUser: widget.studentUser,
+                                    )),
+                          );
+                        },
+                      )  ,
+                 DashboardCard(
+                        text: 'weekly Schedule',
+                        imagePath: 'assets/images/attendance.png',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => TablePage(
+                                      studentUser: widget.studentUser,
+                                    )),
+                          );
+                        },
+                      )  ,
+                      DashboardCard(
+                        text: 'Academic Calender',
+                        imagePath: 'assets/images/weekly_schedual.png',
+                        onPressed: () {
+                           customLaunch(
+                              'https://www.pnu.edu.sa/ar/Pages/UniversityCalender.aspx');
+                        },
+                      ),
+                      DashboardCard(
+                        text: 'technical Support',
+                        imagePath: 'assets/images/support.png',
+                        onPressed: () {
+                          customLaunch(
+                              'mailto:graduation.7wk@gmail.com ?subject=test%20subject&body=test%20body');
+                        },
+                      ),
 
+                    ];
+                    
+                    }
   @override
   Widget build(BuildContext context) {
     bool islogingOut = false;
@@ -90,19 +195,7 @@ class _DashBoardState extends State<DashBoard> {
               }
             },
           ),
-          // DrawerItem(
-          //   text: 'select classes',
-          //   icon: Icons.select_all,
-          //   onTap: () async {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //           builder: (context) => SelectClassesPage(
-          //                 studentUser: widget.studentUser,
-          //               )),
-          //     );
-          //   },
-          // ),
+       
         ]),
       ),
       body: SafeArea(
@@ -118,87 +211,7 @@ class _DashBoardState extends State<DashBoard> {
                     crossAxisSpacing: 10,
                     primary: false,
                     crossAxisCount: 2,
-                    children: <Widget>[
-                      DashboardCard(
-                        text: 'Personal info.',
-                        imagePath: 'assets/images/personal_information.png',
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => EditProfilePage(
-                                      studentUser: widget.studentUser,
-                                    )),
-                          );
-                        },
-                      ),
-                  widget.isTeacher ?DashboardCard(
-                        text: 'QR code Scanner',
-                        imagePath: 'assets/images/qrcode.reader.png',
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => QrCodeGeneratorPage(
-                                    )),
-                          );
-                        },
-                      )    : DashboardCard(
-                        text: 'QR code Scanner',
-                        imagePath: 'assets/images/qrcode.reader.png',
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => QrScannerPage(
-                                      studentUser: widget.studentUser,
-                                    )),
-                          );
-                        },
-                      )   ,
-                 widget.isTeacher ? Container() :    DashboardCard(
-                        text: 'Attendance',
-                        imagePath: 'assets/images/att.png',
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => AttendancePage(
-                                      studentUser: widget.studentUser,
-                                    )),
-                          );
-                        },
-                      )  ,
-                  widget.isTeacher ? Container() : DashboardCard(
-                        text: 'weekly Schedule',
-                        imagePath: 'assets/images/attendance.png',
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => TablePage(
-                                      studentUser: widget.studentUser,
-                                    )),
-                          );
-                        },
-                      )  ,
-                      DashboardCard(
-                        text: 'Academic Calender',
-                        imagePath: 'assets/images/weekly_schedual.png',
-                        onPressed: () {
-                           customLaunch(
-                              'https://www.pnu.edu.sa/ar/Pages/UniversityCalender.aspx');
-                        },
-                      ),
-                      DashboardCard(
-                        text: 'technical Support',
-                        imagePath: 'assets/images/support.png',
-                        onPressed: () {
-                          customLaunch(
-                              'mailto:graduation.7wk@gmail.com ?subject=test%20subject&body=test%20body');
-                        },
-                      ),
-                    ],
+                    children: widgets()
                   ),
                 ),
               ],

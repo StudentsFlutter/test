@@ -6,81 +6,11 @@ import 'package:url_launcher/url_launcher.dart' as launcher;
 
 const password = '**********';
 
-///BY THEMaker
-class EditDialog extends StatefulWidget {
-  bool important;
-  EditDialog({this.important});
-  @override
-  _EditDialogState createState() => _EditDialogState();
-}
-
-///BY THEMaker
-class _EditDialogState extends State<EditDialog> {
-  void _changePassword(String password) async {
-    //Create an instance of the current user.
-    final _auth = FirebaseAuth.instance;
-    final user = await _auth.currentUser;
-    //Pass in the password to updatePassword.
-    user.updatePassword(password).then((_) {
-      print("Successfully changed password");
-    }).catchError((error) {
-      print("Password can't be changed" + error.toString());
-      //This might happen, when the wrong password is in, the user isn't found, or if the user hasn't logged in recently.
-    });
-  }
-
-  String newpass = "";
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Center(
-        child: Text(
-          'change password',
-        ),
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          InputTextField(
-            hintText: 'Password',
-            textInputType: TextInputType.visiblePassword,
-            isObscure: true,
-            onChanged: (value) {
-              newpass = value;
-            },
-          )
-        ],
-      ),
-      actions: <Widget>[
-        Row(
-          children: <Widget>[
-            FlatButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  'Cancel',
-                )),
-            FlatButton(
-              onPressed: () {
-                _changePassword(newpass);
-                Navigator.pop(context);
-              },
-              child: Text(
-                'Save',
-              ),
-            ),
-          ],
-        )
-      ],
-    );
-  }
-}
 
 class EditProfilePage extends StatefulWidget {
   final StudentUser studentUser;
-
-  const EditProfilePage({Key key, @required this.studentUser})
+  final bool isTeacher;
+  const EditProfilePage({Key key, @required this.studentUser,@required this.isTeacher})
       : super(key: key);
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
@@ -178,23 +108,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       icon: Icons.phone,
                     ),
                     InfoCard(
-                      text: 'Student',
+                      text: widget.isTeacher? 'Teacher':  'Student',
                       icon: Icons.web,
                     ),
                     InfoCard(
                         text: password,
                         icon: Icons.card_membership,
                         onPressed: () async {
-                          ///BY THEMaker
                           showDialog(
                               context: context,
                               builder: (context) {
                                 return EditDialog();
                               });
-
-                          // String removeSpaceFromPhoneNumber =
-                          //     phone.replaceAll(new RegExp(r"\s+\b|\b\s"), "");
-                          // final password = 'password';
                         }),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -272,6 +197,76 @@ class InfoCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+///BY THEMaker
+class EditDialog extends StatefulWidget {
+  bool important;
+  EditDialog({this.important});
+  @override
+  _EditDialogState createState() => _EditDialogState();
+}
+
+///BY THEMaker
+class _EditDialogState extends State<EditDialog> {
+  void _changePassword(String password) async {
+    //Create an instance of the current user.
+    final _auth = FirebaseAuth.instance;
+    final user = await _auth.currentUser;
+    //Pass in the password to updatePassword.
+    user.updatePassword(password).then((_) {
+      print("Successfully changed password");
+    }).catchError((error) {
+      print("Password can't be changed" + error.toString());
+      //This might happen, when the wrong password is in, the user isn't found, or if the user hasn't logged in recently.
+    });
+  }
+
+  String newpass = "";
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Center(
+        child: Text(
+          'change password',
+        ),
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InputTextField(
+            hintText: 'Password',
+            textInputType: TextInputType.visiblePassword,
+            isObscure: true,
+            onChanged: (value) {
+              newpass = value;
+            },
+          )
+        ],
+      ),
+      actions: <Widget>[
+        Row(
+          children: <Widget>[
+            FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  'Cancel',
+                )),
+            FlatButton(
+              onPressed: () {
+                _changePassword(newpass);
+                Navigator.pop(context);
+              },
+              child: Text(
+                'Save',
+              ),
+            ),
+          ],
+        )
+      ],
     );
   }
 }

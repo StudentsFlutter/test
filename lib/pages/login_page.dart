@@ -52,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
       final classesRef =
           FirebaseFirestore.instance.collection('classes').doc(id);
       var nameDoc = await classesRef.get();
-      String name = nameDoc['ClassName'];
+      String name = nameDoc['className'];
       List<String> attendaceIds = nameDoc['attendaceIdsList'].cast<String>();
       classes.add(Class(
           name: name,
@@ -105,7 +105,9 @@ class _LoginPageState extends State<LoginPage> {
     if (user != null) {
       DocumentSnapshot doc = await userRef.doc(user.uid).get();
       userM = StudentUser.fromDocument(
-          doc, user.uid);
+          doc, user.uid,
+          await getStudentCLasses(doc)
+          );
       setState(() {
         isLogin = false;
       });
@@ -164,10 +166,26 @@ class _LoginPageState extends State<LoginPage> {
                 color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
-    Function validator = (value) {
+    
+    Function passValidator = (value) {
       if (value.isEmpty) {
         return 'this field cant be empty';
+      } else if (value.length < 6) {
+        return 'Password must be more than 5 characters';
       }
+
+      return null;
+    };
+    Function emailValidator = (value) {
+      bool emailValid = RegExp(
+              r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+          .hasMatch(value);
+      if (value.isEmpty) {
+        return 'this field cant be empty';
+      } else if (!emailValid) {
+        return 'Email format not valid';
+      }
+
       return null;
     };
     return Scaffold(
@@ -189,7 +207,7 @@ class _LoginPageState extends State<LoginPage> {
                           alignment: Alignment.bottomCenter,
                           padding: EdgeInsets.all(5),
                           child: Text(
-                            'QR attendance ',
+                            'QR attendance',
                             style: TextStyle(
                                 color: Colors.teal,
                                 fontWeight: FontWeight.w300,
@@ -210,7 +228,7 @@ class _LoginPageState extends State<LoginPage> {
                           onChanged: (value) {
                             email = value;
                           },
-                          validator: validator,
+                          validator: emailValidator,
                         ),
                         InputTextField(
                           hintText: 'Password',
@@ -219,7 +237,7 @@ class _LoginPageState extends State<LoginPage> {
                           onChanged: (value) {
                             password = value;
                           },
-                          validator: validator,
+                          validator: passValidator,
                         ),
                         loginButton,
                         SizedBox(

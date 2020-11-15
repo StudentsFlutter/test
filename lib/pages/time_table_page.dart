@@ -24,7 +24,7 @@ class _TablePageState extends State<TablePage> {
       final classesRef =
           FirebaseFirestore.instance.collection('classes').doc(id);
       var nameDoc = await classesRef.get();
-      String name = nameDoc['ClassName'];
+      String name = nameDoc['className'];
       classes.add(Class(
           name: name,
           id: classesRef.id,
@@ -111,32 +111,49 @@ class _TableListTileState extends State<TableListTile> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Text(
-              widget.classModel.name,
-              textAlign: TextAlign.center,
-              style: TextStyle(),
-              overflow: TextOverflow.ellipsis,
+    return Container(
+       decoration: BoxDecoration(border: Border.all
+                (
+            color: Colors.grey
+
+        )
+        ), 
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                widget.classModel.name,
+                textAlign: TextAlign.center,
+                style: TextStyle(),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-          ),
-          Container(
-            width: MediaQuery.of(context).size.width * 0.8,
-            height: 100,
-            child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: tfcL.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return AttendanceCard(
-                    wwww: tfcL[index],
-                  );
-                }),
-          ),
-        ],
+            SizedBox (
+              height: 100,
+              width: 1,
+           child: const DecoratedBox(
+      decoration: const BoxDecoration(
+        color: Colors.grey
+      ),
+  ),
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width * 0.75,
+              height: 100,
+              child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: tfcL.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return AttendanceCard(
+                      wwww: tfcL[index],
+                    );
+                  }),
+            ),
+          ],
+        ),
       ),
     );
   }

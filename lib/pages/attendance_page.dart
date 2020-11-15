@@ -34,7 +34,7 @@ class _AttendancePageState extends State<AttendancePage> {
       final classesRef =
           FirebaseFirestore.instance.collection('classes').doc(id);
       var nameDoc = await classesRef.get();
-      String name = nameDoc['ClassName'];
+      String name = nameDoc['className'];
       List<String> attendaceIds = nameDoc['attendaceIdsList'].cast<String>();
       classes.add(Class(
           name: name,
@@ -91,38 +91,64 @@ class AttendanceListTile extends StatefulWidget {
 class _AttendanceListTileState extends State<AttendanceListTile> {
   @override
   Widget build(BuildContext context) {
-   if(widget.classModel.attendaceList==null) print('object');
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Text(
-              widget.classModel.name,
-              textAlign: TextAlign.center,
-              style: TextStyle(),
+    return Container(
+               decoration: BoxDecoration(border: Border.all
+                (
+            color: Colors.grey
+
+        )
+        ), 
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Container(
+            //    height: 100,
+        //         decoration: BoxDecoration(border: Border.all
+        //         (
+        //     color: Colors.grey
+
+        // )
+        // ),
+                child: Text(
+                  widget.classModel.name,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(),
+                ),
+              ),
             ),
-          ),
-          Container(
-            width: MediaQuery.of(context).size.width * 0.8,
+            
+SizedBox (
             height: 100,
-            child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: widget.classModel.attendaceList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return AttendanceCard(
-                    classModel: widget.classModel,
-                    isAttended: widget
-                        .classModel.attendaceList[index].studentsList
-                        .contains(
-                      widget.studentUser.firebaseID,
-                    ),
-                    attendace: widget.classModel.attendaceList[index],
-                  );
-                }),
-          ),
-        ],
+            width: 1,
+         child: const DecoratedBox(
+    decoration: const BoxDecoration(
+      color: Colors.grey
+    ),
+  ),
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width * 0.75,
+              height: 100,
+              child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: widget.classModel.attendaceList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return AttendanceCard(
+                      classModel: widget.classModel,
+                      isAttended: widget
+                          .classModel.attendaceList[index].studentsList
+                          .contains(
+                        widget.studentUser.firebaseID,
+                      ),
+                      attendace: widget.classModel.attendaceList[index],
+                    );
+                  }),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -139,6 +165,7 @@ class AttendanceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      
       width: 100,
       height: 100,
       child: Card(

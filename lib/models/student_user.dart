@@ -11,14 +11,14 @@ class StudentUser {
   List<Class> classesList = [];
   StudentUser({this.id, this.name, this.email, this.phoneNumber, this.level,this.classesList,this.firebaseID});
 
-  factory StudentUser.fromDocument(DocumentSnapshot doc,String firebaseID) {
+  factory StudentUser.fromDocument(DocumentSnapshot doc,String firebaseID,List<Class>classesList ) {
     return StudentUser(
         name: doc['Name'],
         id: doc['UserId'],
         email: doc['Email'],
         level: doc['Level'],
         phoneNumber: doc['PhoneNumber'],
-     //   classesList:classesList,
+        classesList:classesList,
         firebaseID: firebaseID
         );
   }
